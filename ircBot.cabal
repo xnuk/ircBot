@@ -20,7 +20,7 @@ library
                      , tls
                      , network
                      , bytestring
-                     , default
+                     , data-default
   default-language:    Haskell2010
 
 executable ircBot-exe

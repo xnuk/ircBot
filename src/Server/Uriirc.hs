@@ -8,7 +8,7 @@ import "network" Network.Socket (AddrInfo(..), socket, connect, close)
 
 import "bytestring" qualified Data.ByteString as BS (empty)
 
-import "default" Data.Default (def)
+import "data-default" Data.Default (def)
 
 import Control.Exception (try, SomeException)
 
@@ -22,5 +22,8 @@ tlsConnect hostname addr@(AddrInfo {..}) = do
               (defaultParamsClient hostname BS.empty)
                   { clientSupported = def
                       { supportedCiphers = ciphersuite_all
+                      , supportedSecureRenegotiation = False
                       }
+                  , clientShared = def
+                      {}
                   }
