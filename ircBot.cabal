@@ -17,6 +17,11 @@ library
   hs-source-dirs:      src
   exposed-modules:     TLSConnect
                      , Recv
+                     , Sender
+                     , Server.Uriirc
+                     , Plugin.Echo
+                     , Plugin.Plugin
+                     , Plugin.Type
   ghc-options:         -Wall
   build-depends:       base >= 4.7 && < 5
                      , tls
@@ -29,6 +34,8 @@ library
                      , mtl
                      , containers
                      , pcre-heavy
+                     , stm
+                     , safe
   default-language:    Haskell2010
 
 executable ircBot-exe
@@ -39,6 +46,9 @@ executable ircBot-exe
                      , ircBot
                      , tls
                      , text
+                     , stm
+                     , unix
+                     , containers
   default-language:    Haskell2010
 
 test-suite ircBot-test

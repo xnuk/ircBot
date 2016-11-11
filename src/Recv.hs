@@ -1,17 +1,20 @@
 {-# LANGUAGE PackageImports, OverloadedStrings #-}
-module Recv(q) where
+module Recv (parseit, parseMessage, ChunkFunc, loop, sendingIO) where
 
 import "tls" Network.TLS (Context, recvData, sendData)
 import "irc" Network.IRC.Parser (prefix, command, spaces, crlf, parameter)
-import "irc" Network.IRC.Base (Message(..), showMessage)
+import "irc" Network.IRC.Base (Message(..))
 import "attoparsec" Data.Attoparsec.ByteString (IResult(Done, Partial, Fail), parse, option, many', Parser)
-import "mtl" Control.Monad.State.Lazy (State, StateT, get, put, runState, evalStateT)
+import "mtl" Control.Monad.State.Lazy (State, get, put, runState, evalStateT)
 import "bytestring" Data.ByteString (ByteString)
-import Control.Monad (forever, forM_)
+import Control.Monad (forever, forM_, void)
 import "base" Control.Monad.IO.Class (liftIO)
 import "bytestring" Data.ByteString.Lazy (fromStrict)
+import "stm" Control.Concurrent.STM (atomically)
+import "stm" Control.Concurrent.STM.TQueue (TQueue, readTQueue)
+
 import Data.Monoid ((<>))
-import Plugin.Plugin (runPlugin)
+import Control.Concurrent (forkIO)
 
 message :: Parser Message
 message = Message
@@ -19,6 +22,13 @@ message = Message
     <*> command
     <*> many' (spaces *> parameter)
     <*  crlf
+
+type ChunkFunc = ByteString -> IResult ByteString Message
+
+parseMessage :: ChunkFunc
+parseMessage = parse message
+
+{-
 
 q :: Context -> IO ()
 q ctx = evalStateT (p ctx) (parse message)
@@ -35,6 +45,24 @@ p ctx = forever $ do
         "PING" -> sendData ctx . fromStrict $ "PONG " <> head (msg_params msg) <> "\r\n"
         _ -> runPlugin msg >>= mapM_ (sendData ctx . fromStrict)
     return ()
+
+-}
+
+loop :: (Context, ChunkFunc) -> (Message -> IO ()) -> IO ()
+loop (ctx, func) plugin = flip evalStateT func . forever $ do
+    str <- recvData ctx
+    sf <- get
+    let (msgs, sf') = runState (parseit str) sf
+    put sf'
+    liftIO . forM_ msgs $ \msg -> case msg_command msg of
+        "PING" -> sendData ctx . fromStrict $ "PONG " <> head (msg_params msg) <> "\r\n"
+        _ -> void $ forkIO (plugin msg)
+    return ()
+
+sendingIO :: Context -> TQueue ByteString -> IO a
+sendingIO ctx tq = forever $ do
+    msg <- atomically $ readTQueue tq
+    sendData ctx . fromStrict $ msg
 
 parseit :: ByteString -> State (ByteString -> IResult ByteString Message) [Message]
 parseit msg = do
