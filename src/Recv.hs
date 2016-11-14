@@ -75,6 +75,6 @@ parseit msg = do
         Partial func -> do
             put func
             return []
-        Fail i _ _ -> do
-            put (parse message)
-            parseit i
+        Fail i errs err -> errorWithoutStackTrace $ unlines errs ++ "\n\n" ++ err
+            -- put (parse message)
+            -- parseit i
