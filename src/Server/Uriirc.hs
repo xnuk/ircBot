@@ -31,14 +31,14 @@ connect nickname channels = do
                 else z f'
         q msg = case msg_command msg of
             "NOTICE" | msg_params msg == ["AUTH", "*** Checking Ident"] -> do
-                sendData ctx . fromStrict $ "NICK " <> nickname <> "\r\nUSER " <> nickname <> " xnuk xnuk :Did you know that Xnuk is so kawaii?\r\n"
+                sendData ctx . fromStrict $ "NICK unlambdachan\r\nUSER unlambdachan xnuk xnuk :xnuk\r\n" -- no utf8 at first
                 print (showMessage msg)
                 return False
             "PING" -> do
                 sendData ctx . fromStrict $ "PONG " <> head (msg_params msg) <> "\r\n"
                 return False
             "001" -> do
-                sendData ctx . fromStrict $ "JOIN " <> channels <> "\r\n"
+                sendData ctx . fromStrict $ "NICK " <> nickname <> "\r\nUSER " <> nickname <> " xnuk xnuk :Did you know that Xnuk is so kawaii?\r\nJOIN " <> channels <> "\r\n"
                 print (showMessage msg)
                 return True
             _ -> return False

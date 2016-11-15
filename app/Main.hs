@@ -23,7 +23,7 @@ import IrcBot (bot)
 
 nick, channels :: ByteString
 nick = encodeUtf8 "리덈늼"
-channels = "#botworld #botworld2"
+channels = "#botworld,#botworld2"
 
 plugins :: [Plugin]
 plugins = [Echo.plugin]
