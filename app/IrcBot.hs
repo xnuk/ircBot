@@ -3,7 +3,7 @@ module IrcBot (bot) where
 import Recv (ChunkFunc, loop, sendingIO)
 import qualified Sender as S (sender)
 import Plugin.Plugin (runPlugin, PluginWrapper(..))
-import Plugin.Type (Plugin, Setting)
+import Plugin.Type (Plugin, Setting, Attr(Protected))
 import "bytestring" Data.ByteString (ByteString)
 import "tls" Network.TLS (Context, bye)
 import "stm" Control.Concurrent.STM.TQueue (TQueue, newTQueue)
@@ -20,7 +20,7 @@ bot :: (ByteString -> ByteString -> IO (Context, ChunkFunc))
     -> IO (TQueue ByteString, IO ())
 
 bot connect nick chan setting' plugins = do
-    setting <- newMVar $ M.insert "Protected.nickname" nick setting'
+    setting <- newMVar $ M.insert (Protected "nickname") nick setting'
     sendingQueue <- atomically newTQueue
     let sender = S.sender sendingQueue
         plugin = PluginWrapper { setting, plugins, sender }

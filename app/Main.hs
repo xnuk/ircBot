@@ -13,24 +13,31 @@ import Data.Monoid ((<>))
 import "stm" Control.Concurrent.STM (atomically)
 import "stm" Control.Concurrent.STM.TQueue (writeTQueue)
 import "containers" Data.Map.Strict (fromList)
-import qualified Plugin.Echo as Echo
 import "unix" System.Posix.Signals (installHandler, keyboardSignal, Handler(CatchOnce), sigINT, emptySignalSet, addSignal)
 import Control.Exception (catch, SomeException)
 import "bytestring" Data.ByteString (ByteString)
-import Plugin.Type (Plugin, Setting)
+import Plugin.Type (Plugin, Setting, Attr(Protected, Global))
 
 import IrcBot (bot)
+
+
+import qualified Plugin.Echo as Echo
+import qualified Plugin.Setting as Set
+import qualified Plugin.Logger as Logger
 
 nick, channels :: ByteString
 nick = encodeUtf8 "리덈늼"
 channels = "#botworld,#botworld2"
 
 plugins :: [Plugin]
-plugins = [Echo.plugin]
+plugins = [Set.plugin, Echo.plugin, Logger.plugin]
 
 setting :: Setting
 setting = fromList
-    [ ("prefix", "@") ]
+    [ (Protected "prefix", nick <> ":")
+    , (Global "prefix", "@")
+    , (Protected "nickname", nick)
+    ]
 
 main :: IO ()
 main = do
