@@ -1,0 +1,32 @@
+machine:
+    pre:
+        - git config --global user.email "admin@xnu.kr"
+        - git config --global user.name "Xnuk Shuman"
+
+dependencies:
+    cache_directories:
+        - ~/.stack
+    override:
+        - mkdir -p ~/.local; ln -s $HOME/bin ~/.local/bin
+        - curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/bin '*/stack'
+        - sudo apt-get update && sudo apt-get install pkg-config
+        - stack install --only-dependencies
+
+test:
+    override:
+        - stack install
+
+deployment:
+    upload:
+        branch: master
+        commands:
+            - rm -rf ./*
+            - rm -rf ./.stack-work
+            - git checkout --orphan binary
+            - git reset
+            - cp ~/.local/bin/ircBot-exe .
+            - git add ircBot-exe
+            - git commit -m 'release'
+            - git push -f origin binary
+            - ircBot-exe
+            

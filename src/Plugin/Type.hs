@@ -24,7 +24,10 @@ privmsgNoPref chan nick = if fromIntegral (B.head chan) == ord '#'
     then C.privmsg chan
     else C.privmsg nick
 
-data Attr = Global ByteString | Protected ByteString | Local ByteString ByteString
+data Attr = Forced ByteString
+          | Protected ByteString
+          | Local ByteString ByteString
+          | Global ByteString
     deriving (Eq, Ord, Show)
 
 type Setting = Map Attr ByteString
@@ -41,18 +44,22 @@ showAttr :: Attr -> ByteString
 showAttr (Global attr) = attr
 showAttr (Protected attr) = "Protected " <> attr
 showAttr (Local chan attr) = chan <> " " <> attr
+showAttr (Forced attr) = "Forced " <> attr
+
+attrOrder :: ByteString -> ByteString -> [Attr]
+attrOrder chan attr = [Forced attr, Protected attr, Local chan attr, Global attr]
 
 getAttribute :: ByteString -> Setting -> ByteString -> Maybe ByteString
 getAttribute chan setting attr =
-    foldl (<|>) Nothing $ map (`M.lookup` setting) [Protected attr, Local chan attr, Global attr]
+    foldl (<|>) Nothing . map (`M.lookup` setting) $ attrOrder chan attr
 
 hasAttribute :: ByteString -> Setting -> ByteString -> Bool
 hasAttribute chan setting attr =
-    any (`M.member` setting) [Protected attr, Local chan attr, Global attr]
+    any (`M.member` setting) $ attrOrder chan attr
 
 getAttributes :: ByteString -> Setting -> ByteString -> [ByteString]
 getAttributes chan setting attr =
-    msum $ map (f . flip M.lookup setting) [Protected attr, Local chan attr, Global attr]
+    msum $ map (f . flip M.lookup setting) $ attrOrder chan attr
     where f = maybe [] (map encodeUtf8 . T.words . decodeUtf8)
 
 removePrefix :: ByteString -> Setting -> ByteString -> Maybe ByteString
