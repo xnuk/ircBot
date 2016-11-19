@@ -10,6 +10,7 @@ import "irc" Network.IRC.Base (Message(..), showMessage)
 import Control.Monad.IO.Class (liftIO)
 import "bytestring" Data.ByteString.Lazy (fromStrict)
 import "bytestring" Data.ByteString (ByteString)
+import "network" Network.Socket (Socket)
 
 muntil :: Monad m => [m Bool] -> m Bool
 muntil [] = return False
@@ -19,9 +20,9 @@ muntil (x:xs) = do
         then return True
         else muntil xs
 
-connect :: ByteString -> ByteString -> IO (Context, ChunkFunc)
+connect :: ByteString -> ByteString -> IO ((Context, Socket), ChunkFunc)
 connect nickname channels = do
-    ctx <- tlsConnect "irc.uriirc.org" "16664"
+    nctx@(ctx, _) <- tlsConnect "irc.uriirc.org" "16664"
     let z f = do
             str <- recvData ctx
             let (msgs, f') = runState (parseit str) f
@@ -43,4 +44,4 @@ connect nickname channels = do
                 return True
             _ -> return False
     f <- z parseMessage
-    return (ctx, f)
+    return (nctx, f)

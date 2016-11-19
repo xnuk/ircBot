@@ -6,13 +6,15 @@ import Plugin.Plugin (runPlugin, PluginWrapper(..))
 import Plugin.Type (Plugin, Setting, Attr(Protected))
 import "bytestring" Data.ByteString (ByteString)
 import "tls" Network.TLS (Context, bye)
-import "stm" Control.Concurrent.STM.TQueue (TQueue, newTQueue)
+import "stm" Control.Concurrent.STM.TQueue (TQueue, newTQueue, writeTQueue)
 import "stm" Control.Concurrent.STM (atomically)
 import Control.Concurrent (forkFinally, killThread)
-import Control.Concurrent.MVar (newMVar)
+import Control.Concurrent.MVar (newMVar, modifyMVar_)
 import qualified "containers" Data.Map.Strict as M
+import "network" Network.Socket (Socket, isConnected)
+import Control.Monad (when)
 
-bot :: (ByteString -> ByteString -> IO (Context, ChunkFunc))
+bot :: (ByteString -> ByteString -> IO ((Context, Socket), ChunkFunc))
     -> ByteString -- nick
     -> ByteString -- chan
     -> Setting
@@ -21,11 +23,21 @@ bot :: (ByteString -> ByteString -> IO (Context, ChunkFunc))
 
 bot connect nick chan setting' plugins = do
     setting <- newMVar $ M.insert (Protected "nickname") nick setting'
+    lock <- newMVar False
     sendingQueue <- atomically newTQueue
-    let sender = S.sender sendingQueue
+
+    ((ctx, sock), func) <- connect nick chan
+    let close = modifyMVar_ lock $ \v -> if v then return v else do
+            x <- isConnected sock
+            when x $ do
+                atomically $ writeTQueue sendingQueue "QUIT\r\n"
+                bye ctx
+            return True
+
+        sender = S.sender sendingQueue
         plugin = PluginWrapper { setting, plugins, sender }
-    x@(ctx, _) <- connect nick chan
-    let close = const (putStrLn "&wat*" >> bye ctx)
-    ircSendThread <- forkFinally (sendingIO ctx sendingQueue) close
-    ircRecvThread <- forkFinally (loop x $ runPlugin plugin) close
-    return (sendingQueue, bye ctx >> killThread ircSendThread >> killThread ircRecvThread)
+
+    ircSendThread <- forkFinally (sendingIO ctx sendingQueue) (const close)
+    ircRecvThread <- forkFinally (loop (ctx, func) $ runPlugin plugin) (const close)
+
+    return (sendingQueue, close >> killThread ircSendThread >> killThread ircRecvThread)

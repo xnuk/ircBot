@@ -14,12 +14,12 @@ import "stm" Control.Concurrent.STM (atomically)
 import "stm" Control.Concurrent.STM.TQueue (writeTQueue)
 import "containers" Data.Map.Strict (fromList)
 import "unix" System.Posix.Signals (installHandler, keyboardSignal, Handler(CatchOnce), sigINT, emptySignalSet, addSignal)
-import Control.Exception (catch, SomeException)
 import "bytestring" Data.ByteString (ByteString)
 import Plugin.Type (Plugin, Setting, Attr(Protected, Global))
+import Control.Concurrent (killThread, forkFinally)
+import Control.Concurrent.MVar (newEmptyMVar, putMVar, takeMVar)
 
 import IrcBot (bot)
-
 
 import qualified Plugin.Echo as Echo
 import qualified Plugin.Setting as Set
@@ -41,15 +41,28 @@ setting = fromList
 
 main :: IO ()
 main = do
-    (sendingQueue, byeby) <- bot connect nick channels setting plugins
-    let byebye = putStrLn ">close<" >> byeby
-    _ <- installHandler keyboardSignal (CatchOnce byebye) (Just $ addSignal sigINT emptySignalSet)
+    (sendingQueue, byebye) <- bot connect nick channels setting plugins
+
 #ifndef DEBUG
-    let lineIO = forever $ do
-            line <- encodeUtf8 <$> T.getLine
-            atomically $ writeTQueue sendingQueue (line <> "\r\n")
-    catch lineIO $ \e -> do
-        putStrLn $ "UI: " ++ show (e :: SomeException)
-        byebye
+    lock <- newEmptyMVar
+    let unlock = putMVar lock ()
+    thread <- flip forkFinally (const unlock) . forever $ do
+        line <- encodeUtf8 <$> T.getLine
+        atomically $ writeTQueue sendingQueue (line <> "\r\n")
 #endif
+
+    _ <- installHandler keyboardSignal (CatchOnce $ do
+        byebye
+
+#ifndef DEBUG
+        killThread thread
+        unlock
+#endif
+
+        ) (Just $ addSignal sigINT emptySignalSet)
+
+#ifndef DEBUG
+    takeMVar lock
+#else
     return ()
+#endif

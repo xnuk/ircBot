@@ -28,26 +28,6 @@ type ChunkFunc = ByteString -> IResult ByteString Message
 parseMessage :: ChunkFunc
 parseMessage = parse message
 
-{-
-
-q :: Context -> IO ()
-q ctx = evalStateT (p ctx) (parse message)
-
-p :: Context -> StateT (ByteString -> IResult ByteString Message) IO ()
-p ctx = forever $ do
-    str <- recvData ctx
-    sf <- get
-    let (msgs, sf') = runState (parseit str) sf
-    put sf'
-    liftIO . forM_ msgs $ \msg -> case msg_command msg of
-        "NOTICE" | msg_params msg == ["AUTH", "*** Checking Ident"] -> sendData ctx "NICK Xnuk\r\nUSER Xnuk xnuk xnuk :xnuk\r\n" >> print (showMessage msg)
-        "001" -> sendData ctx "JOIN #botworld\r\n" >> print (showMessage msg)
-        "PING" -> sendData ctx . fromStrict $ "PONG " <> head (msg_params msg) <> "\r\n"
-        _ -> runPlugin msg >>= mapM_ (sendData ctx . fromStrict)
-    return ()
-
--}
-
 loop :: (Context, ChunkFunc) -> (Message -> IO ()) -> IO ()
 loop (ctx, func) plugin = flip evalStateT func . forever $ do
     str <- recvData ctx
