@@ -43,7 +43,7 @@ main :: IO ()
 main = do
     (sendingQueue, byeby) <- bot connect nick channels setting plugins
     let byebye = putStrLn ">close<" >> byeby
-    installHandler keyboardSignal (CatchOnce byebye) (Just $ addSignal sigINT emptySignalSet)
+    _ <- installHandler keyboardSignal (CatchOnce byebye) (Just $ addSignal sigINT emptySignalSet)
 #ifndef DEBUG
     let lineIO = forever $ do
             line <- encodeUtf8 <$> T.getLine
