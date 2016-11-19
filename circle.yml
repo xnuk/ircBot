@@ -9,13 +9,13 @@ dependencies:
     override:
         - mkdir -p ~/.local; ln -s $HOME/bin ~/.local/bin
         - curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/bin '*/stack'
-        - sudo apt-get update && sudo apt-get install pkg-config
+        - sudo apt-get update && sudo apt-get install pkg-config perl
         - stack install --only-dependencies
 
 test:
     override:
         - perl nightly.pl
-        - git diff --no-ext-diff --quiet --exit-code || git add stack.yaml && git commit -m 'bump up stack resolver version' && git push || exit 1
+        - git diff --no-ext-diff --quiet --exit-code || sh git.sh
         - stack test && stack install
 
 deployment:
