@@ -10,9 +10,9 @@ main :: IO ()
 main = hspec $ do
     describe "General test" $
         it "does pcre-light works correctly?" $ do
-            match [re|^(a)b(c)|] "abc" [] `shouldBe` Just ["a", "c"]
-            match [re|^(a?)b(c)|] "cbc" [] `shouldBe` Just ["", "c"]
-            match [re|^(a?)b(c)|] "abc" [] `shouldBe` Just ["a", "c"]
+            match [re|^(a)b(c)|] "abc" [] `shouldBe` Just ["abc", "a", "c"]
+            match [re|^(a?)b(c)|] "cbc" [] `shouldBe` Nothing
+            match [re|^(a?)b(c)|] "abc" [] `shouldBe` Just ["abc", "a", "c"]
     describe "Plugin: Setting" $
         it "have correct regex" $ do
             ("set nickname Xnuk" :: ByteString) =~ Setting.regexSet `shouldBe` True
