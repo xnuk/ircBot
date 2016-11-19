@@ -28,3 +28,6 @@ deployment:
             - git add ircBot-exe
             - git commit -m 'release'
             - git push -f origin binary
+notify:
+    webhooks:
+        - url: https://www.xnu.kr/webhook/circleci/ircBot
