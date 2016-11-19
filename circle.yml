@@ -14,6 +14,8 @@ dependencies:
 
 test:
     override:
+        - perl nightly.pl
+        - git diff --no-ext-diff --quiet --exit-code || git add stack.yaml && git commit -m 'bump up stack resolver version' && git push || exit 1
         - stack install
 
 deployment:
