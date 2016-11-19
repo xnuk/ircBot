@@ -1,5 +1,5 @@
 {-# LANGUAGE PackageImports, OverloadedStrings #-}
-module Plugin.Type (Plugin, Setting, Sender, removePrefix, getAttribute, hasAttribute, Attr(..), showAttr, makePlugin, Checker, Messager, privmsg, privmsgNoPref) where
+module Plugin.Type (Plugin, Setting, Sender, removePrefix, getAttribute, hasAttribute, Attr(..), showAttr, makePlugin, Checker, Messager, privmsg, privmsgNoPref, privmsgT, privmsgNoPrefT) where
 
 import "irc" Network.IRC.Base (Message)
 import qualified "irc" Network.IRC.Commands as C (privmsg)
@@ -7,6 +7,7 @@ import "bytestring" Data.ByteString (ByteString)
 import qualified "bytestring" Data.ByteString as B
 import "text" Data.Text.Encoding (encodeUtf8, decodeUtf8)
 import qualified "text" Data.Text as T
+import "text" Data.Text (Text)
 import "containers" Data.Map.Strict (Map)
 import qualified "containers" Data.Map.Strict as M
 import Control.Applicative ((<|>))
@@ -23,6 +24,12 @@ privmsgNoPref :: ByteString -> ByteString -> ByteString -> Message
 privmsgNoPref chan nick = if fromIntegral (B.head chan) == ord '#'
     then C.privmsg chan
     else C.privmsg nick
+
+privmsgT :: ByteString -> ByteString -> Text -> Message
+privmsgT chan nick = privmsg chan nick . encodeUtf8
+
+privmsgNoPrefT :: ByteString -> ByteString -> Text -> Message
+privmsgNoPrefT chan nick = privmsgNoPref chan nick . encodeUtf8
 
 data Attr = Forced ByteString
           | Protected ByteString

@@ -10,7 +10,7 @@ import Data.Monoid ((<>))
 import Data.Maybe (fromMaybe)
 import "bytestring" Data.ByteString (ByteString)
 
-import Plugin.Type (Plugin, Setting, Sender, removePrefix, Attr(..), getAttribute, showAttr, makePlugin, privmsgNoPref, privmsg)
+import Plugin.Type (Plugin, Setting, Sender, removePrefix, Attr(..), getAttribute, showAttr, makePlugin, privmsgNoPref, privmsgT, privmsgNoPrefT)
 
 regexSet, regexUnset, regexSuper, regexNormal, regexGet :: Regex
 regexSet = [re|^set([glf]?)\s+([^\s]+)\s+(.+)$|]
@@ -39,13 +39,13 @@ messager setting send (Message (Just (NickName nick _ _)) "PRIVMSG" [chan, mssg]
             send [ privmsgNoPref chan nick $ encodeUtf8 " ✓ " <> showAttr attr]
             return setting'
         Nothing -> do
-            send [ privmsg chan nick $ encodeUtf8 " ✗ 실패하였습니다." ]
+            send [ privmsgT chan nick " ✗ 실패하였습니다." ]
             return setting
     | msg' =~ regexUnset = case msgUnset chan setting msg' of
-        Just setting' -> send [privmsgNoPref chan nick $ encodeUtf8 " ✓"] >> return setting'
-        Nothing -> send [privmsg chan nick $ encodeUtf8 " ✗ 이미 설정되지 않았습니다."] >> return setting
+        Just setting' -> send [privmsgNoPrefT chan nick " ✓"] >> return setting'
+        Nothing -> send [privmsgT chan nick " ✗ 이미 설정되지 않았습니다."] >> return setting
     | otherwise = do
-        send [ privmsg chan nick $ encodeUtf8 " ✗ 잘못된 구문입니다." ]
+        send [ privmsgT chan nick " ✗ 잘못된 구문입니다." ]
         return setting
     where msg' = fromMaybe "" $  removePrefix chan setting mssg
 messager _ _ _ = fail "NickName only supported"
@@ -72,7 +72,7 @@ msgSet chan setting msg = do
 
 msgUnset :: ByteString -> Setting -> ByteString -> Maybe Setting
 msgUnset chan setting msg = do
-    (_:g:s:_) <- match regexSet msg []
+    (_:g:s:_) <- match regexUnset msg []
     let attr = case g of
             "f" -> Forced s
             "g" -> Global s
