@@ -1,12 +1,12 @@
-{-# LANGUAGE PackageImports, QuasiQuotes, OverloadedStrings #-}
-module Plugin.Echo where
+{-# LANGUAGE QuasiQuotes, OverloadedStrings #-}
+module Xnukbot.Plugin.Base.Echo where
 
 import "irc" Network.IRC.Base (Message(..), Prefix(NickName))
 import "pcre-heavy" Text.Regex.PCRE.Heavy ((=~), re, sub, Regex)
 import "bytestring" Data.ByteString (empty)
 import Data.Maybe (fromJust)
 
-import Plugin.Type (Plugin, Setting, Sender, removePrefix, hasAttribute, privmsg)
+import Xnukbot.Plugin.Base.Types (Plugin, Setting, Sender, removePrefix, hasAttribute, privmsg)
 
 regexCmd :: Regex
 regexCmd = [re|^echo(?:\s+|$)|]

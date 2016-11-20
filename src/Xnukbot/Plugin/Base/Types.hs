@@ -1,5 +1,5 @@
-{-# LANGUAGE PackageImports, OverloadedStrings #-}
-module Plugin.Type (Plugin, Setting, Sender, removePrefix, getAttribute, hasAttribute, Attr(..), showAttr, makePlugin, Checker, Messager, privmsg, privmsgNoPref, privmsgT, privmsgNoPrefT) where
+{-# LANGUAGE OverloadedStrings #-}
+module Xnukbot.Plugin.Base.Types (Plugin, Setting, Sender, removePrefix, getAttribute, hasAttribute, Attr(..), showAttr, makePlugin, Checker, Messager, privmsg, privmsgNoPref, privmsgT, privmsgNoPrefT) where
 
 import "irc" Network.IRC.Base (Message)
 import qualified "irc" Network.IRC.Commands as C (privmsg)

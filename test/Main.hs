@@ -1,10 +1,13 @@
-{-# LANGUAGE QuasiQuotes, OverloadedStrings, PackageImports #-}
-import Test.Hspec
+{-# LANGUAGE QuasiQuotes, OverloadedStrings #-}
+
+module Main where
+
+import "hspec" Test.Hspec
 import "pcre-heavy" Text.Regex.PCRE.Heavy (re, (=~))
 import "pcre-light" Text.Regex.PCRE.Light (match)
 import "bytestring" Data.ByteString (ByteString)
 
-import qualified Plugin.Setting as Setting
+import qualified "xnukbot" Xnukbot.Plugin.Base.Setting as Setting
 
 main :: IO ()
 main = hspec $ do

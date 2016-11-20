@@ -1,7 +1,7 @@
-{-# LANGUAGE PackageImports, OverloadedStrings #-}
-module Sender (sender) where
+{-# LANGUAGE OverloadedStrings #-}
+module Xnukbot.Connect.Sender (sender) where
 
-import Plugin.Type (Sender)
+import Xnukbot.Plugin.Base.Types (Sender)
 import "irc" Network.IRC.Base (showMessage)
 import Data.Monoid ((<>))
 import "stm" Control.Concurrent.STM.TQueue (TQueue, writeTQueue)

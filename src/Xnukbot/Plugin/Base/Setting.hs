@@ -1,5 +1,5 @@
-{-# LANGUAGE PackageImports, QuasiQuotes, OverloadedStrings #-}
-module Plugin.Setting where
+{-# LANGUAGE QuasiQuotes, OverloadedStrings #-}
+module Xnukbot.Plugin.Base.Setting where
 
 import "irc" Network.IRC.Base (Message(..), Prefix(NickName))
 import "text" Data.Text.Encoding (encodeUtf8)
@@ -10,7 +10,7 @@ import Data.Monoid ((<>))
 import Data.Maybe (fromMaybe)
 import "bytestring" Data.ByteString (ByteString)
 
-import Plugin.Type (Plugin, Setting, Sender, removePrefix, Attr(..), getAttribute, showAttr, makePlugin, privmsgNoPref, privmsgT, privmsgNoPrefT)
+import Xnukbot.Plugin.Base.Types (Plugin, Setting, Sender, removePrefix, Attr(..), getAttribute, showAttr, makePlugin, privmsgNoPref, privmsgT, privmsgNoPrefT)
 
 regexSet, regexUnset, regexSuper, regexNormal, regexGet :: Regex
 regexSet = [re|^set([glf]?)\s+([^\s]+)\s+(.+)$|]

@@ -1,17 +1,18 @@
-{-# LANGUAGE PackageImports, OverloadedStrings, RecordWildCards, CPP #-}
-module Plugin.Plugin (runPlugin, PluginWrapper(..)) where
+{-# LANGUAGE OverloadedStrings, RecordWildCards, CPP #-}
+module Xnukbot.Plugin.Base (runPlugin, PluginWrapper(..)) where
+
 import "irc" Network.IRC.Base (Message(..))
 import Control.Concurrent.MVar (MVar, modifyMVar_)
 import Control.Exception (catch, SomeException)
 import System.IO (hPutStr, stderr)
 import Control.Arrow (second)
 import Data.Monoid ((<>))
-import Data.Text.Encoding (decodeUtf8, encodeUtf8)
-import qualified Data.Text as T (words)
+import "text" Data.Text.Encoding (decodeUtf8, encodeUtf8)
+import qualified "text" Data.Text as T (words)
 import "bytestring" Data.ByteString (stripPrefix)
 import Data.Maybe (fromMaybe)
 
-import Plugin.Type (Plugin, Setting, Sender, getAttribute)
+import Xnukbot.Plugin.Base.Types (Plugin, Setting, Sender, getAttribute)
 import "safe" Safe (headMay)
 
 data PluginWrapper = PluginWrapper

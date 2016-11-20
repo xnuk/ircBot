@@ -1,9 +1,10 @@
-{-# LANGUAGE PackageImports, OverloadedStrings, NamedFieldPuns #-}
+{-# LANGUAGE OverloadedStrings, NamedFieldPuns #-}
 module IrcBot (bot) where
-import Recv (ChunkFunc, loop, sendingIO)
-import qualified Sender as S (sender)
-import Plugin.Plugin (runPlugin, PluginWrapper(..))
-import Plugin.Type (Plugin, Setting, Attr(Protected))
+
+import Xnukbot.Connect.Recv (ChunkFunc, loop, sendingIO)
+import qualified Xnukbot.Connect.Sender as S (sender)
+import Xnukbot.Plugin.Base (runPlugin, PluginWrapper(..))
+import Xnukbot.Plugin.Base.Types (Plugin, Setting, Attr(Protected))
 import "bytestring" Data.ByteString (ByteString)
 import "tls" Network.TLS (Context, bye)
 import "stm" Control.Concurrent.STM.TQueue (TQueue, newTQueue, writeTQueue)

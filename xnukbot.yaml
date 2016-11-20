@@ -1,0 +1,30 @@
+name: xnukbot
+version: 0.1.0.0
+license: BSD3
+license-file: LICENSE
+author: Xnuk Shuman
+category: Web
+
+all:
+    depend:
+        base: '<5 && >= 4.7'
+    extension:
+        - PackageImports
+
+lib:
+    src: src/
+    expose:
+        - Xnukbot.Connect.*
+        - Xnukbot.Plugin.Base
+        - Xnukbot.Plugin.Base.*
+        - Xnukbot.Server.*
+
+exe:
+    name: xnukbot
+    src: app/
+    main: Main
+
+test:
+    name: xnukbot-test
+    src: test/
+    main: Main

@@ -1,5 +1,5 @@
-{-# LANGUAGE PackageImports, RecordWildCards #-}
-module TLSConnect (tlsConnect) where
+{-# LANGUAGE RecordWildCards #-}
+module Xnukbot.Connect.TLSConnect (tlsConnect) where
 
 import "tls" Network.TLS (contextNew, defaultParamsClient, ClientParams(..), Supported(..), Shared(..), ValidationCache(ValidationCache), ValidationCacheResult (ValidationCachePass), handshake, Context)
 import "tls" Network.TLS.Extra.Cipher (ciphersuite_all)

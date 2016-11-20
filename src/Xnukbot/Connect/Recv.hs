@@ -1,5 +1,5 @@
-{-# LANGUAGE PackageImports, OverloadedStrings #-}
-module Recv (parseit, parseMessage, ChunkFunc, loop, sendingIO) where
+{-# LANGUAGE OverloadedStrings #-}
+module Xnukbot.Connect.Recv (parseit, parseMessage, ChunkFunc, loop, sendingIO) where
 
 import "tls" Network.TLS (Context, recvData, sendData)
 import "irc" Network.IRC.Parser (prefix, command, spaces, crlf, parameter)

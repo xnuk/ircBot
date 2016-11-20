@@ -1,12 +1,10 @@
-{-# LANGUAGE PackageImports #-}
-
-module Plugin.Logger where
+module Xnukbot.Plugin.Base.Logger where
 
 import "irc" Network.IRC.Base (showMessage)
 import qualified "text" Data.Text.IO as T (putStrLn)
 import "text" Data.Text.Encoding (decodeUtf8)
 
-import Plugin.Type (Plugin)
+import Xnukbot.Plugin.Base.Types (Plugin)
 
 plugin :: Plugin
 plugin = ("Logger", f)

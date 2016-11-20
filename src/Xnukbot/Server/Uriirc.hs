@@ -1,9 +1,9 @@
-{-# LANGUAGE PackageImports, OverloadedStrings #-}
-module Server.Uriirc (connect) where
+{-# LANGUAGE OverloadedStrings #-}
+module Xnukbot.Server.Uriirc (connect) where
 
 import "tls" Network.TLS (recvData, sendData, Context)
-import TLSConnect (tlsConnect)
-import Recv (parseit, parseMessage, ChunkFunc)
+import Xnukbot.Connect.TLSConnect (tlsConnect)
+import Xnukbot.Connect.Recv (parseit, parseMessage, ChunkFunc)
 import "mtl" Control.Monad.State.Lazy (runState)
 import Data.Monoid ((<>))
 import "irc" Network.IRC.Base (Message(..), showMessage)

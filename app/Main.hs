@@ -1,8 +1,8 @@
-{-# LANGUAGE PackageImports, OverloadedStrings, NamedFieldPuns, CPP #-}
+{-# LANGUAGE OverloadedStrings, NamedFieldPuns, CPP #-}
 
 module Main where
 
-import Server.Uriirc (connect)
+import "xnukbot" Xnukbot.Server.Uriirc (connect)
 
 
 import qualified "text" Data.Text.IO as T
@@ -15,15 +15,15 @@ import "stm" Control.Concurrent.STM.TQueue (writeTQueue)
 import "containers" Data.Map.Strict (fromList)
 import "unix" System.Posix.Signals (installHandler, keyboardSignal, Handler(CatchOnce), sigINT, emptySignalSet, addSignal)
 import "bytestring" Data.ByteString (ByteString)
-import Plugin.Type (Plugin, Setting, Attr(Protected, Global))
+import Xnukbot.Plugin.Base.Types (Plugin, Setting, Attr(Protected, Global))
 import Control.Concurrent (killThread, forkFinally)
 import Control.Concurrent.MVar (newEmptyMVar, putMVar, takeMVar)
 
 import IrcBot (bot)
 
-import qualified Plugin.Echo as Echo
-import qualified Plugin.Setting as Set
-import qualified Plugin.Logger as Logger
+import qualified Xnukbot.Plugin.Base.Echo as Echo
+import qualified Xnukbot.Plugin.Base.Setting as Set
+import qualified Xnukbot.Plugin.Base.Logger as Logger
 
 nick, channels :: ByteString
 nick = encodeUtf8 "리덈늼"

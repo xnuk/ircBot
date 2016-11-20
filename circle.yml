@@ -26,8 +26,8 @@ deployment:
             - rm -rf ./.stack-work
             - git checkout --orphan binary
             - git reset
-            - cp ~/.local/bin/ircBot-exe .
-            - git add ircBot-exe
+            - cp ~/.local/bin/xnukbot .
+            - git add xnukbot
             - git commit -m 'release'
             - git push -f origin binary
 notify:
