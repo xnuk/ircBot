@@ -18,3 +18,12 @@ while(<$in>){
 }
 close($out);
 close($in);
+
+if(system("git diff --no-ext-diff --quiet --exit-code")){
+	system("git add stack.yaml") ||
+	system("git commit -m 'bump stack resolver version'") ||
+	system("git fetch") ||
+	system("git rebase origin master") ||
+	system("git push");
+	die "updated resolver to $x"
+}

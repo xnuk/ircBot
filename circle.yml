@@ -14,9 +14,7 @@ dependencies:
 
 test:
     override:
-        - perl nightly.pl
-        - git diff --no-ext-diff --quiet --exit-code || sh git.sh
-        - stack test && stack install
+        - perl nightly.pl && stack test && stack install
 
 deployment:
     upload:
