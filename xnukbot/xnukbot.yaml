@@ -18,6 +18,7 @@ lib:
         - Xnukbot.Plugin.Base
         - Xnukbot.Plugin.Base.*
         - Xnukbot.Server.*
+        - Xnukbot.IrcBot
 
 exe:
     name: xnukbot

@@ -10,9 +10,9 @@ cabal-version: 1.12
 
 library
   hs-source-dirs: src/
-  exposed-modules: Xnukbot.Connect.Recv, Xnukbot.Connect.TLSConnect, Xnukbot.Connect.Sender, Xnukbot.Plugin.Base, Xnukbot.Plugin.Base.Logger, Xnukbot.Plugin.Base.Setting, Xnukbot.Plugin.Base.Echo, Xnukbot.Plugin.Base.Types, Xnukbot.Server.Uriirc
+  exposed-modules: Xnukbot.Connect.Recv, Xnukbot.Connect.Sender, Xnukbot.Connect.TLSConnect, Xnukbot.IrcBot, Xnukbot.Plugin.Base, Xnukbot.Plugin.Base.Echo, Xnukbot.Plugin.Base.Logger, Xnukbot.Plugin.Base.Setting, Xnukbot.Plugin.Base.Types, Xnukbot.Server.Uriirc
   ghc-options: -Wall
-  build-depends: tls, irc, attoparsec, mtl, bytestring, base, stm, network, data-default, text, safe, pcre-heavy, pcre-light, containers, base <5 && >= 4.7
+  build-depends: attoparsec, base <5 && >= 4.7, bytestring, containers, data-default, irc, mtl, network, pcre-heavy, pcre-light, safe, stm, text, tls
   default-language: Haskell2010
   default-extensions: PackageImports
 
@@ -20,8 +20,7 @@ executable xnukbot
   hs-source-dirs: app/
   main-is: Main.hs
   ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N -O2
-  build-depends: xnukbot, text, stm, containers, unix, bytestring, tls, network, base <5 && >= 4.7
-  other-modules: IrcBot
+  build-depends: base <5 && >= 4.7, bytestring, containers, stm, text, unix, xnukbot
   default-language: Haskell2010
   default-extensions: PackageImports
 
@@ -29,7 +28,7 @@ test-suite xnukbot-test
   type: exitcode-stdio-1.0
   hs-source-dirs: test/
   main-is: Main.hs
-  build-depends: hspec, pcre-heavy, pcre-light, bytestring, xnukbot, base <5 && >= 4.7
+  build-depends: base <5 && >= 4.7, bytestring, hspec, pcre-heavy, pcre-light, xnukbot
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   default-language: Haskell2010
   default-extensions: PackageImports

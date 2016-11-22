@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings, NamedFieldPuns #-}
-module IrcBot (bot) where
+module Xnukbot.IrcBot (bot) where
 
 import Xnukbot.Connect.Recv (ChunkFunc, loop, sendingIO)
 import qualified Xnukbot.Connect.Sender as S (sender)

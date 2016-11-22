@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings, NamedFieldPuns, CPP #-}
+{-# LANGUAGE OverloadedStrings, CPP #-}
 
 module Main where
 
@@ -19,7 +19,7 @@ import Xnukbot.Plugin.Base.Types (Plugin, Setting, Attr(Protected, Global))
 import Control.Concurrent (killThread, forkFinally)
 import Control.Concurrent.MVar (newEmptyMVar, putMVar, takeMVar)
 
-import IrcBot (bot)
+import "xnukbot" Xnukbot.IrcBot (bot)
 
 import qualified Xnukbot.Plugin.Base.Echo as Echo
 import qualified Xnukbot.Plugin.Base.Setting as Set
