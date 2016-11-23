@@ -8,5 +8,8 @@ category: Web
 lib:
     src: src/
     expose:
-        - Xnukbot.Plugin.*
-
+        - Xnukbot.Plugin.*.*
+    depend:
+        base: '>= 4.7 && < 5'
+    extension:
+        - PackageImports
