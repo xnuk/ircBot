@@ -9,7 +9,7 @@ import "bytestring" Data.ByteString (ByteString)
 import qualified "containers" Data.Map.Strict as M
 
 import qualified "xnukbot" Xnukbot.Plugin.Base.Setting as Setting
-import "xnukbot" Xnukbot.Plugin.Base.Types (Attr(..), getAttribute, getAttributes)
+import "xnukbot" Xnukbot.Plugin (AttrT(..), getAttribute, getAttributes)
 import Data.List (sort)
 
 main :: IO ()
