@@ -20,11 +20,6 @@ lib:
         - Xnukbot.Server.*
         - Xnukbot.IrcBot
 
-exe:
-    name: xnukbot
-    src: app/
-    main: Main
-
 test:
     name: xnukbot-test
     src: test/

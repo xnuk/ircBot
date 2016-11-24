@@ -1,15 +1,15 @@
-name: xnukbot-plugins
+name: xnukbot-exe
 version: 0.1.0.0
 license: BSD3
 license-file: LICENSE
 author: Xnuk Shuman
 category: Web
 
-lib:
-    src: src/
-    expose:
-        - Xnukbot.Plugin.Data.*
+exe:
+    name: xnukbot
+    src: app/
+    main: Main
     depend:
-        base: '>= 4.7 && < 5'
+        base: '<5 && >= 4.7'
     extension:
         - PackageImports

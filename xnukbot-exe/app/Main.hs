@@ -4,7 +4,6 @@ module Main where
 
 import "xnukbot" Xnukbot.Server.Uriirc (connect)
 
-
 import qualified "text" Data.Text.IO as T
 import "text" Data.Text.Encoding (encodeUtf8)
 
@@ -24,13 +23,14 @@ import "xnukbot" Xnukbot.IrcBot (bot)
 import qualified Xnukbot.Plugin.Base.Echo as Echo
 import qualified Xnukbot.Plugin.Base.Setting as Set
 import qualified Xnukbot.Plugin.Base.Logger as Logger
+import qualified "xnukbot-plugins" Xnukbot.Plugin.Data.Random as Random
 
 nick, channels :: ByteString
 nick = encodeUtf8 "리덈늼"
 channels = "#botworld,#botworld2"
 
 plugins :: [Plugin]
-plugins = [Set.plugin, Echo.plugin, Logger.plugin]
+plugins = [Random.plugin, Set.plugin, Echo.plugin, Logger.plugin]
 
 setting :: Setting
 setting = fromList
