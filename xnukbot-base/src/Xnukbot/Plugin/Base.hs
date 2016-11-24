@@ -6,6 +6,7 @@ import Control.Concurrent.MVar (modifyMVar_)
 import Control.Exception (catch, SomeException)
 import System.IO (hPutStr, stderr)
 import Control.Arrow (second)
+import Control.Applicative ((<|>))
 import Data.Monoid ((<>))
 import "text" Data.Text.Encoding (decodeUtf8, encodeUtf8)
 import qualified "text" Data.Text as T (words)
@@ -28,7 +29,10 @@ runPlugin PluginWrapper{..} msg = modifyMVar_ setting $ \conf -> do
                         newcmd <- getAttribute chan conf ("alias." <> cmd)
                         body <- stripPrefix cmd message
                         return $ msg{msg_params = [chan, newcmd <> body]}
-                in fromMaybe msg alias
+                    aliasf = do
+                        newmsg <- getAttribute chan conf ("alias!." <> message)
+                        return $ msg{msg_params = [chan, newmsg]}
+                in fromMaybe msg (aliasf <|> alias)
           | otherwise = msg
 
         plugs = filter (fst . snd) $ map (second (\f -> f conf sender msg')) plugins
