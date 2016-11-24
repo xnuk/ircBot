@@ -2,8 +2,6 @@
 
 module Main where
 
-import "xnukbot" Xnukbot.Server.Uriirc (connect)
-
 import qualified "text" Data.Text.IO as T
 import "text" Data.Text.Encoding (encodeUtf8)
 
@@ -14,15 +12,16 @@ import "stm" Control.Concurrent.STM.TQueue (writeTQueue)
 import "containers" Data.Map.Strict (fromList)
 import "unix" System.Posix.Signals (installHandler, keyboardSignal, Handler(CatchOnce), sigINT, emptySignalSet, addSignal)
 import "bytestring" Data.ByteString (ByteString)
-import Xnukbot.Plugin.Base.Types (Plugin, Setting, Attr(Protected, Global))
 import Control.Concurrent (killThread, forkFinally)
 import Control.Concurrent.MVar (newEmptyMVar, putMVar, takeMVar)
 
+import "xnukbot" Xnukbot.Server.Uriirc (connect)
 import "xnukbot" Xnukbot.IrcBot (bot)
+import "xnukbot" Xnukbot.Plugin.Types (Plugin, Setting, AttrT(Protected, Global))
 
-import qualified Xnukbot.Plugin.Base.Echo as Echo
-import qualified Xnukbot.Plugin.Base.Setting as Set
-import qualified Xnukbot.Plugin.Base.Logger as Logger
+import qualified "xnukbot" Xnukbot.Plugin.Base.Echo as Echo
+import qualified "xnukbot" Xnukbot.Plugin.Base.Setting as Set
+import qualified "xnukbot" Xnukbot.Plugin.Base.Logger as Logger
 import qualified "xnukbot-plugins" Xnukbot.Plugin.Data.Random as Random
 
 nick, channels :: ByteString

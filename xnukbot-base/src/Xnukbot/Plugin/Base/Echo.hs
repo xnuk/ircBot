@@ -1,12 +1,13 @@
 {-# LANGUAGE QuasiQuotes, OverloadedStrings #-}
 module Xnukbot.Plugin.Base.Echo where
 
-import "irc" Network.IRC.Base (Message(..), Prefix(NickName))
 import "pcre-heavy" Text.Regex.PCRE.Heavy ((=~), re, sub, Regex)
 import "bytestring" Data.ByteString (empty)
 import Data.Maybe (fromJust)
 
-import Xnukbot.Plugin.Base.Types (Plugin, Setting, Sender, removePrefix, hasAttribute, privmsg)
+import Xnukbot.Plugin.Types (Plugin, Setting, Sender, makePlugin, Message(..), Prefix(NickName))
+import Xnukbot.Plugin.Attr (hasAttribute, removePrefix)
+import Xnukbot.Plugin.Util (privmsg)
 
 regexCmd :: Regex
 regexCmd = [re|^echo(?:\s+|$)|]
@@ -24,7 +25,5 @@ messager setting send (Message (Just (NickName nick _ _)) "PRIVMSG" [chan, msg])
 messager _ _ _ = fail "Nickname only supported"
 
 plugin :: Plugin
-plugin =
-    let func setting sender msg = (checker setting msg, messager setting sender msg)
-    in ("Echo", func)
+plugin = makePlugin "Echo" checker messager
 

@@ -12,7 +12,7 @@ library
   hs-source-dirs: src/
   exposed-modules: Xnukbot.Plugin.Data.Random
   ghc-options: -Wall
-  build-depends: base >= 4.7 && < 5, bytestring, containers, irc, pcre-heavy, pcre-light, random, safe, text, xnukbot
+  build-depends: base >= 4.7 && < 5, bytestring, containers, pcre-heavy, pcre-light, random, safe, text, xnukbot
   default-language: Haskell2010
   default-extensions: PackageImports
 

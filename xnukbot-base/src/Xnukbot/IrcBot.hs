@@ -3,8 +3,8 @@ module Xnukbot.IrcBot (bot) where
 
 import Xnukbot.Connect.Recv (ChunkFunc, loop, sendingIO)
 import qualified Xnukbot.Connect.Sender as S (sender)
-import Xnukbot.Plugin.Base (runPlugin, PluginWrapper(..))
-import Xnukbot.Plugin.Base.Types (Plugin, Setting, Attr(Protected))
+import Xnukbot.Plugin.Base (runPlugin)
+import Xnukbot.Plugin.Types (Plugin, PluginWrapper(..), Setting, AttrT(Protected))
 import "bytestring" Data.ByteString (ByteString)
 import "tls" Network.TLS (Context, bye)
 import "stm" Control.Concurrent.STM.TQueue (TQueue, newTQueue, writeTQueue)

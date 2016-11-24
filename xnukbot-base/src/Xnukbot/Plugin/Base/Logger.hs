@@ -4,7 +4,7 @@ import "irc" Network.IRC.Base (showMessage)
 import qualified "text" Data.Text.IO as T (putStrLn)
 import "text" Data.Text.Encoding (decodeUtf8)
 
-import Xnukbot.Plugin.Base.Types (Plugin)
+import Xnukbot.Plugin.Types (Plugin)
 
 plugin :: Plugin
 plugin = ("Logger", f)

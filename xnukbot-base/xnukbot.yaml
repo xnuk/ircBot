@@ -15,7 +15,11 @@ lib:
     src: src/
     expose:
         - Xnukbot.Connect.*
+        - Xnukbot.Plugin
         - Xnukbot.Plugin.Base
+        - Xnukbot.Plugin.Types
+        - Xnukbot.Plugin.Util
+        - Xnukbot.Plugin.Attr
         - Xnukbot.Plugin.Base.*
         - Xnukbot.Server.*
         - Xnukbot.IrcBot

@@ -1,8 +1,8 @@
 {-# LANGUAGE OverloadedStrings, RecordWildCards, CPP #-}
-module Xnukbot.Plugin.Base (runPlugin, PluginWrapper(..)) where
+module Xnukbot.Plugin.Base (makePlugin, runPlugin, PluginWrapper(..), Checker, Messager, Sender, Plugin) where
 
 import "irc" Network.IRC.Base (Message(..))
-import Control.Concurrent.MVar (MVar, modifyMVar_)
+import Control.Concurrent.MVar (modifyMVar_)
 import Control.Exception (catch, SomeException)
 import System.IO (hPutStr, stderr)
 import Control.Arrow (second)
@@ -12,14 +12,10 @@ import qualified "text" Data.Text as T (words)
 import "bytestring" Data.ByteString (stripPrefix)
 import Data.Maybe (fromMaybe)
 
-import Xnukbot.Plugin.Base.Types (Plugin, Setting, Sender, getAttribute)
 import "safe" Safe (headMay)
 
-data PluginWrapper = PluginWrapper
-    { setting :: MVar Setting
-    , plugins :: [Plugin]
-    , sender  :: Sender
-    }
+import Xnukbot.Plugin.Types (Sender, Checker, Messager, Plugin, makePlugin, PluginWrapper(..))
+import Xnukbot.Plugin.Attr (getAttribute)
 
 runPlugin :: PluginWrapper -> Message -> IO ()
 runPlugin PluginWrapper{..} msg = modifyMVar_ setting $ \conf -> do

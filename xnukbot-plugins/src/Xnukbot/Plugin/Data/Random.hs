@@ -1,10 +1,9 @@
 {-# LANGUAGE OverloadedStrings, QuasiQuotes #-}
 module Xnukbot.Plugin.Data.Random (plugin) where
 
-import "xnukbot" Xnukbot.Plugin.Base.Types
-    ( Plugin, Checker, Messager, Attr(..)
-    , removePrefix, makePlugin, hasAttribute, privmsgT
-    )
+import "xnukbot" Xnukbot.Plugin.Types (Plugin, makePlugin, Checker, Messager, AttrT(..), Message(Message), Prefix(NickName))
+import "xnukbot" Xnukbot.Plugin.Attr (removePrefix, hasAttribute)
+import "xnukbot" Xnukbot.Plugin.Util (privmsgT)
 
 import "pcre-heavy" Text.Regex.PCRE.Heavy (re, (=~), Regex)
 import "pcre-light" Text.Regex.PCRE.Light (match)
@@ -19,8 +18,6 @@ import qualified "text" Data.Text as T
 import qualified "containers" Data.Map.Strict as M
 
 import "random" System.Random (newStdGen, randomR)
-
-import "irc" Network.IRC.Base (Message(Message), Prefix(NickName))
 
 regex :: Regex
 regex = [re|^random(.)\1*(.+)$|]
