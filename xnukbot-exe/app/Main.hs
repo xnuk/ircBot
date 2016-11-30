@@ -24,6 +24,7 @@ import qualified "xnukbot" Xnukbot.Plugin.Base.Setting as Set
 import qualified "xnukbot" Xnukbot.Plugin.Base.Logger as Logger
 import qualified "xnukbot-plugins" Xnukbot.Plugin.Data.Random as Random
 import qualified "xnukbot-plugins" Xnukbot.Plugin.Join.Part as Part
+import qualified "xnukbot-plugins" Xnukbot.Plugin.Join.Invite as Invite
 import qualified "xnukbot-plugins" Xnukbot.Plugin.Simple.Emoji as Emoji
 
 nick, channels :: ByteString
@@ -31,7 +32,7 @@ nick = encodeUtf8 "리덈늼"
 channels = "#botworld,#botworld2"
 
 plugins :: [Plugin]
-plugins = [Part.plugin, Emoji.plugin, Random.plugin, Set.plugin, Echo.plugin, Logger.plugin]
+plugins = [Invite.plugin, Part.plugin, Emoji.plugin, Random.plugin, Set.plugin, Echo.plugin, Logger.plugin]
 
 setting :: Setting
 setting = fromList
