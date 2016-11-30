@@ -1,6 +1,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Xnukbot.Plugin.Types
-    ( Sender, Checker, Messager, Plugin, makePlugin, PluginWrapper(..)
+    ( Sender
+    , Checker, MsgChecker, fromMsgChecker
+    , Messager, MsgMessager, fromMsgMessager
+    , Plugin, makePlugin, makeMsgPlugin, PluginWrapper(..)
     , AttrT(..), unAttrT, Attr, showAttr, Setting
     , Message(..), Prefix(..)
     , Channel
@@ -14,10 +17,13 @@ import Data.Monoid ((<>))
 import Control.Concurrent.MVar (MVar)
 
 type Channel = ByteString
+type Nick = ByteString
 
 --- Plugin ---
 type Checker = Setting -> Message -> Bool
+type MsgChecker = Setting -> (Channel, Nick, ByteString) -> Bool
 type Messager = Setting -> Sender -> Message -> IO Setting
+type MsgMessager = Setting -> Sender -> (Channel, Nick, ByteString) -> IO Setting
 type Sender = [Message] -> IO ()
 type Plugin = (String, Setting -> Sender -> Message -> (Bool, IO Setting))
 
@@ -30,6 +36,21 @@ data PluginWrapper = PluginWrapper
 makePlugin :: String -> Checker -> Messager -> Plugin
 makePlugin name checker messager = (name, plug)
     where plug setting' sender' msg = (checker setting' msg, messager setting' sender' msg)
+
+fromMsgChecker :: MsgChecker -> Checker
+fromMsgChecker checker setting' (Message (Just (NickName nick _ _)) "PRIVMSG" [chan, msg]) =
+    checker setting' (chan, nick, msg)
+
+fromMsgChecker _ _ _ = False
+
+fromMsgMessager :: MsgMessager -> Messager
+fromMsgMessager messager setting' send (Message (Just (NickName nick _ _)) "PRIVMSG" [chan, msg]) =
+    messager setting' send (chan, nick, msg)
+
+fromMsgMessager _ _ _ _ = fail "Nope"
+
+makeMsgPlugin :: String -> MsgChecker -> MsgMessager -> Plugin
+makeMsgPlugin name checker messager = makePlugin name (fromMsgChecker checker) (fromMsgMessager messager)
 
 --- Attr ---
 data AttrT a = Forced a
