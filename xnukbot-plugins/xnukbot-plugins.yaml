@@ -11,6 +11,7 @@ lib:
         - Xnukbot.Plugin.Data.*
         - Xnukbot.Plugin.Data.Random.Util
         - Xnukbot.Plugin.Simple.*
+        - Xnukbot.Plugin.Join.*
     depend:
         base: '>= 4.7 && < 5'
     extension:
