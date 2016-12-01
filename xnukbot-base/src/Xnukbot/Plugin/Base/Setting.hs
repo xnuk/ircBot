@@ -8,13 +8,14 @@ import qualified "containers" Data.Map.Strict as M
 import Data.Monoid ((<>))
 import Data.Maybe (fromMaybe)
 import "bytestring" Data.ByteString (ByteString)
+import Data.List (intersperse)
 
 import Xnukbot.Plugin.Types
     ( Message(..), Prefix(NickName)
     , Plugin, Setting, Sender, AttrT(..), Attr
     , makePlugin
     )
-import Xnukbot.Plugin.Attr (showAttr, getAttribute, removePrefix)
+import Xnukbot.Plugin.Attr (showAttr, getAttribute, getAttributes, removePrefix)
 import Xnukbot.Plugin.Util (privmsgNoPref, privmsgT, privmsgNoPrefT)
 
 regexSet, regexUnset, regexSuper, regexNormal, regexGet :: Regex
@@ -23,7 +24,7 @@ regexUnset = [re|^unset([glf]?)\s+([^\s]+)\s*$|]
 
 regexNormal = [re|^(?:un)?setl?\s+[^\s]|]
 regexSuper = [re|^(?:un)?set[lgf]?\s+[^\s]|]
-regexGet = [re|^set([pglf]?)\s+([^\s]+)\s*$|]
+regexGet = [re|^[sg]et([spglf]?)\s+([^\s]+)\s*$|]
 
 checker :: Setting -> Message -> Bool
 checker setting (Message (Just (NickName nick _ _)) "PRIVMSG" [chan, msg])
@@ -63,6 +64,7 @@ msgGet chan setting msg = do
         "l" -> flip M.lookup setting $ Local chan s
         "p" -> flip M.lookup setting $ Protected s
         "f" -> flip M.lookup setting $ Forced s
+        "s" -> Just . mconcat . intersperse " " $ getAttributes chan setting s
         _ -> getAttribute chan setting s
 
 msgSet :: ByteString -> Setting -> ByteString -> Maybe (Attr, Setting)
