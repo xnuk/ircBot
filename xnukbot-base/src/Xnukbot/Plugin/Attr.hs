@@ -6,6 +6,8 @@ module Xnukbot.Plugin.Attr
 
 import "bytestring" Data.ByteString (ByteString)
 import qualified "bytestring" Data.ByteString as B
+import qualified "text" Data.Text as T
+import "text" Data.Text.Encoding (encodeUtf8, decodeUtf8)
 
 import qualified "containers" Data.Map.Strict as M
 
@@ -37,7 +39,7 @@ hasAttribute chan setting =
     any (`M.member` setting) . listAttrT chan
 
 getAttributes :: Channel -> Setting -> ByteString -> [ByteString]
-getAttributes = attrGet
+getAttributes c s = map encodeUtf8 . concatMap (T.words . decodeUtf8) . attrGet c s
 
 removePrefix :: Channel -> Setting -> ByteString -> Maybe ByteString
 removePrefix chan setting message

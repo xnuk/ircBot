@@ -24,7 +24,11 @@ main = hspec $ do
                 [ (Protected "prefix", "@")
                 , (Global "prefix", "$")
                 , (Local "#botworld" "kawaii", "Xnuk")
+                , (Local "#test" "prefix", "! :")
                 , (Global "kawaii", "No")
+                , (Protected "sex", "null")
+                , (Forced "sex", "yes")
+                , (Global "sex", "lol")
                 ]
         it "have correct regex" $ do
             ("set nickname Xnuk" :: ByteString) =~ Setting.regexSet `shouldBe` True
@@ -34,5 +38,8 @@ main = hspec $ do
             getAttribute "#botworld" simpleSetting "kawaii" `shouldBe` Just "Xnuk"
         it "getAttributes" $ do
             sort (getAttributes "" simpleSetting "prefix") `shouldBe` sort ["@", "$"]
+            sort (getAttributes "#test" simpleSetting "prefix") `shouldBe` sort ["@", "!", ":"]
             getAttributes "#botworld" simpleSetting "kawaii" `shouldBe` ["Xnuk"]
-
+        it "Forced" $ do
+            getAttribute "" simpleSetting "sex" `shouldBe` Just "yes"
+            getAttributes "" simpleSetting "sex" `shouldBe` ["yes"]
