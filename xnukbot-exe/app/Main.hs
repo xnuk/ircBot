@@ -26,17 +26,19 @@ import qualified "xnukbot-plugins" Xnukbot.Plugin.Data.Random as Random
 import qualified "xnukbot-plugins" Xnukbot.Plugin.Join.Part as Part
 import qualified "xnukbot-plugins" Xnukbot.Plugin.Join.Invite as Invite
 import qualified "xnukbot-plugins" Xnukbot.Plugin.Simple.Emoji as Emoji
+import qualified "xnukbot-plugins" Xnukbot.Plugin.Setting.Export as Export
 
 nick, channels :: ByteString
 nick = encodeUtf8 "리덈늼"
 channels = "#botworld,#botworld2"
 
 plugins :: [Plugin]
-plugins = [Invite.plugin, Part.plugin, Emoji.plugin, Random.plugin, Set.plugin, Echo.plugin, Logger.plugin]
+plugins = [Export.plugin, Invite.plugin, Part.plugin, Emoji.plugin, Random.plugin, Set.plugin, Echo.plugin, Logger.plugin]
 
 setting :: Setting
 setting = fromList
-    [ (Protected "prefix", nick <> ":")
+    [ (Protected "nickname", encodeUtf8 "리덈늼")
+    , (Protected "prefix", nick <> ":")
     , (Global "prefix", "@")
     , (Protected "nickname", nick)
     ]

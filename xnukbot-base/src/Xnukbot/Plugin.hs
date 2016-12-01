@@ -2,7 +2,10 @@
 module Xnukbot.Plugin
     ( runPlugin -- Base
 -- Types
-    , Sender, Checker, MsgChecker, Messager, MsgMessager, Plugin, makePlugin, makeMsgPlugin, PluginWrapper(..)
+    , Sender
+    , Checker, MsgChecker, fromMsgChecker
+    , Messager, MsgMessager, fromMsgMessager
+    , Plugin, makePlugin, makeMsgPlugin, PluginWrapper(..)
     , AttrT(..), unAttrT, Attr, showAttr, Setting
     , Message(..), Prefix(..)
     , Channel
