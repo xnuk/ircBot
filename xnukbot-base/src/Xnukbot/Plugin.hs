@@ -1,7 +1,8 @@
+{-# LANGUAGE NoImplicitPrelude #-}
 module Xnukbot.Plugin
     ( runPlugin -- Base
 -- Types
-    , Sender, Checker, Messager, Plugin, makePlugin, PluginWrapper(..)
+    , Sender, Checker, MsgChecker, Messager, MsgMessager, Plugin, makePlugin, makeMsgPlugin, PluginWrapper(..)
     , AttrT(..), unAttrT, Attr, showAttr, Setting
     , Message(..), Prefix(..)
     , Channel

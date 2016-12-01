@@ -27,9 +27,9 @@ regexSuper = [re|^(?:un)?set[lgf]?\s+[^\s]|]
 regexGet = [re|^[sg]et([spglf]?)\s+([^\s]+)\s*$|]
 
 checker :: Setting -> Message -> Bool
-checker setting (Message (Just (NickName nick _ _)) "PRIVMSG" [chan, msg])
+checker setting (Message (Just (NickName _ _ host)) "PRIVMSG" [chan, msg])
     =  maybe False (=~ regexGet) msg'
-    || nick == encodeUtf8 "즈눅" && maybe False (=~ regexSuper) msg'
+    || host == Just "xnu.kr" && maybe False (=~ regexSuper) msg'
     || maybe False (=~ regexNormal) msg'
     where msg' = removePrefix chan setting msg
 checker _ _ = False
