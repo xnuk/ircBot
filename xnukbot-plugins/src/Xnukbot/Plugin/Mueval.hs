@@ -11,6 +11,7 @@ import Control.Applicative ((<|>))
 
 import Control.Concurrent (forkIO, killThread, threadDelay, forkFinally)
 import Control.Concurrent.MVar (newEmptyMVar, tryTakeMVar, putMVar, mkWeakMVar)
+import Control.Exception (catch, SomeException)
 
 import Control.Monad (when)
 
@@ -76,9 +77,13 @@ messager setting send (chan, nick, msg) = forkIO run >> return setting
 
         run = do
             lock <- newEmptyMVar
+            putStrLn "MuA"
             th <- forkFinally interpret (\_ -> putMVar lock ())
+            putStrLn "MuB"
             threadDelay 5000000 -- it's μs!
+            putStrLn "MuC"
             v <- tryTakeMVar lock
+            print v
             when (isNothing v) $ do
                 killThread th
                 send' " ✗ Killed"
@@ -86,7 +91,10 @@ messager setting send (chan, nick, msg) = forkIO run >> return setting
             return ()
 
         interpret = do
-            z <- runInterpreter (interpreter option')
+            putStrLn "MuE"
+            z <- catch (runInterpreter (interpreter option')) $ \e ->
+                    return . Left . UnknownError $ show (e :: SomeException)
+            putStrLn "MuF"
             let s = case z of
                     Right (_, t, res) -> take 420 $ if typeOnly option' then t else res
                     Left err -> case err of
