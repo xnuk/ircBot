@@ -45,13 +45,13 @@ messager setting send (Message (Just (NickName nick _ _)) "PRIVMSG" [chan, mssg]
             send [ privmsgNoPref chan nick $ encodeUtf8 " ✓ " <> showAttr attr]
             return setting'
         Nothing -> do
-            send [ privmsgT chan nick " ✗ 실패하였습니다." ]
+            send $ privmsgT chan nick " ✗ 실패하였습니다."
             return setting
     | msg' =~ regexUnset = case msgUnset chan setting msg' of
-        Just setting' -> send [privmsgNoPrefT chan nick " ✓"] >> return setting'
-        Nothing -> send [privmsgT chan nick " ✗ 이미 설정되지 않았습니다."] >> return setting
+        Just setting' -> send (privmsgNoPrefT chan nick " ✓") >> return setting'
+        Nothing -> send (privmsgT chan nick " ✗ 이미 설정되지 않았습니다.") >> return setting
     | otherwise = do
-        send [ privmsgT chan nick " ✗ 잘못된 구문입니다." ]
+        send $ privmsgT chan nick " ✗ 잘못된 구문입니다."
         return setting
     where msg' = fromMaybe "" $  removePrefix chan setting mssg
 messager _ _ _ = fail "NickName only supported"

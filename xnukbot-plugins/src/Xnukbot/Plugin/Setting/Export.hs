@@ -30,7 +30,7 @@ messager setting send (chan, nick, _) = (>> return setting) . forkIO $ do
         Forced    x -> "f " <> x <> " " <> v <> "\n"
         Global    x -> "g " <> x <> " " <> v <> "\n"
         Protected x -> "p " <> x <> " " <> v <> "\n"
-    send [ privmsgNoPrefT chan nick " ✓ 저장했습니다♥" ]
+    send $ privmsgNoPrefT chan nick " ✓ 저장했습니다"
 
 plugin :: Plugin
 plugin = makePlugin "SettingExport" checker (fromMsgMessager messager)

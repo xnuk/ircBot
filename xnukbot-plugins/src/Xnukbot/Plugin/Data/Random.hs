@@ -27,7 +27,7 @@ messager setting send (Message (Just (NickName nick _ _)) "PRIVMSG" [chan, msg])
     case matching of
         Just (_:del:str:_) -> if null arr then return setting else do
             (x, setting') <- choice arr setting
-            send [ privmsgT chan nick x ]
+            send $ privmsgT chan nick x
             return setting'
             where arr = filter (/= T.empty) $ T.split (== delim) strT
                   delim = T.head $ decodeUtf8 del

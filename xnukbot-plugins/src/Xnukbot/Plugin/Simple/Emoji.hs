@@ -70,7 +70,7 @@ messager setting send (chan, nick, msg) = do
     (x, setting') <-if | msg =~ [re|lenny\s*$|] -> return (lenny, setting)
                        | member msg emojis -> maybe (fail "No emoji") (return . (,setting)) $ lookup msg emojis
                        | otherwise -> choice tableFlips setting
-    forkIO $ send [ privmsgNoPrefT chan nick x ]
+    forkIO . send $ privmsgNoPrefT chan nick x
     return setting'
 
 plugin :: Plugin

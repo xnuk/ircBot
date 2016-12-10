@@ -13,6 +13,7 @@ import "bytestring" Data.ByteString (ByteString)
 import qualified "bytestring" Data.ByteString as B
 
 import "text" Data.Text (Text)
+import qualified "text" Data.Text as T
 import "text" Data.Text.Encoding (encodeUtf8)
 
 seqOr :: [Maybe a] -> Maybe [a]
@@ -30,8 +31,8 @@ privmsgNoPref chan nick = if fromIntegral (B.head chan) == ord '#'
     then C.privmsg chan
     else C.privmsg nick
 
-privmsgT :: ByteString -> ByteString -> Text -> Message
-privmsgT chan nick = privmsg chan nick . encodeUtf8
+privmsgT :: ByteString -> ByteString -> Text -> [Message]
+privmsgT chan nick = map (privmsg chan nick . encodeUtf8) . T.lines
 
-privmsgNoPrefT :: ByteString -> ByteString -> Text -> Message
-privmsgNoPrefT chan nick = privmsgNoPref chan nick . encodeUtf8
+privmsgNoPrefT :: ByteString -> ByteString -> Text -> [Message]
+privmsgNoPrefT chan nick = map (privmsgNoPref chan nick . encodeUtf8) . T.lines
