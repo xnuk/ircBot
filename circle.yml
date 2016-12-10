@@ -13,8 +13,13 @@ dependencies:
         - stack install --only-dependencies
 
 test:
+    pre:
+        - perl nightly.pl
     override:
-        - perl nightly.pl && stack test && stack install
+        - stack install
+        - stack test || true # very awkward
+        - stack runhaskell ./xnukbot-base/test/Main.hs
+        - stack runhaskell ./xnukbot-plugins/test/Main.hs
 
 deployment:
     upload:

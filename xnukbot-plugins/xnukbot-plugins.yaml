@@ -5,6 +5,12 @@ license-file: LICENSE
 author: Xnuk Shuman
 category: Web
 
+all:
+    depend:
+        base: '>= 4.7 && < 5'
+    extension:
+        - PackageImports
+
 lib:
     src: src/
     expose:
@@ -14,7 +20,8 @@ lib:
         - Xnukbot.Plugin.Join.*
         - Xnukbot.Plugin.Setting.*
         - Xnukbot.Plugin.Mueval
-    depend:
-        base: '>= 4.7 && < 5'
-    extension:
-        - PackageImports
+
+test:
+    name: xnukbot-plugins-test
+    src: test/
+    main: Main
