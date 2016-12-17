@@ -8,13 +8,12 @@ dependencies:
         - ~/.stack
     override:
         - mkdir -p ~/.local; ln -s $HOME/bin ~/.local/bin
-        - curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/bin '*/stack'
         - sudo apt-get update && sudo apt-get install pkg-config perl
+        - perl nightly.pl
+        - curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/bin '*/stack'
         - stack install --only-dependencies --install-ghc
 
 test:
-    pre:
-        - perl nightly.pl
     override:
         - stack install
         - stack test || true # very awkward
