@@ -10,7 +10,7 @@ dependencies:
         - mkdir -p ~/.local; ln -s $HOME/bin ~/.local/bin
         - curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/bin '*/stack'
         - sudo apt-get update && sudo apt-get install pkg-config perl
-        - stack install --only-dependencies
+        - stack install --only-dependencies --install-ghc
 
 test:
     pre:
