@@ -12,6 +12,8 @@ import Control.Concurrent.MVar (newEmptyMVar, putMVar, takeMVar, tryPutMVar)
 
 import Control.Monad (unless, when, void)
 
+import Data.Maybe (fromMaybe)
+
 main :: IO ()
 main = hspec $
     describe "Mueval" $
@@ -27,7 +29,8 @@ msgPlugTest plugin setting message send = do
     let (name, plug) = plugin
         err str = tryPutMVar m (Just str) >> fail str
         send' msgs = send err msgs >> void (tryPutMVar m Nothing)
-        (_, g) = plug setting send' (message {msg_prefix = Just $ NickName "Xnuk" Nothing Nothing})
-    g
+        g = plug setting send' (message {msg_prefix = Just $ NickName "Xnuk" Nothing Nothing})
+
+    fromMaybe (fail (name ++ ": checker does not match")) g
     a <- takeMVar m
     a `shouldBe` Nothing
