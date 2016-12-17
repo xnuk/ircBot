@@ -15,40 +15,45 @@ import "bytestring" Data.ByteString (ByteString)
 import Control.Concurrent (killThread, forkFinally)
 import Control.Concurrent.MVar (newEmptyMVar, putMVar, takeMVar)
 
+import "vector" Data.Vector (Vector, snoc, empty)
+
 import "xnukbot" Xnukbot.Server.Uriirc (connect)
 import "xnukbot" Xnukbot.IrcBot (bot)
 import "xnukbot" Xnukbot.Plugin.Types (Plugin, Setting, AttrT(Protected, Global))
 
-import qualified "xnukbot" Xnukbot.Plugin.Base.Echo as Echo
-import qualified "xnukbot" Xnukbot.Plugin.Base.Setting as Setting
-import qualified "xnukbot" Xnukbot.Plugin.Base.Logger as Logger
-import qualified "xnukbot-plugins" Xnukbot.Plugin.Data.Random as Random
-import qualified "xnukbot-plugins" Xnukbot.Plugin.Join.Part as Part
-import qualified "xnukbot-plugins" Xnukbot.Plugin.Join.Invite as Invite
-import qualified "xnukbot-plugins" Xnukbot.Plugin.Simple.Emoji as Emoji
-import qualified "xnukbot-plugins" Xnukbot.Plugin.Setting.Export as Export
-import qualified "xnukbot-plugins" Xnukbot.Plugin.Mueval as Mueval
+#define I(Z) import qualified Xnukbot.Plugin.Z
+I(Mueval)
+I(Setting.Export)
+I(Simple.Emoji)
+I(Data.Random)
+I(Base.Setting)
+I(Base.Echo)
+I(Join.Invite)
+I(Join.Part)
+I(Base.Logger)
+#undef I
+
+plugins :: Vector Plugin
+plugins = empty
+#define I(Z) `snoc` Xnukbot.Plugin.Z.plugin
+    I(Mueval)
+    I(Setting.Export)
+    I(Simple.Emoji)
+    I(Data.Random)
+    I(Base.Setting)
+    I(Base.Echo)
+    I(Join.Invite)
+    I(Join.Part)
+    I(Base.Logger)
+#undef I
 
 nick, channels :: ByteString
 nick = encodeUtf8 "리덈늼"
 channels = "#botworld,#botworld2"
 
-plugins :: [Plugin]
-plugins =
-    [ Mueval.plugin
-    , Export.plugin
-    , Emoji.plugin
-    , Random.plugin
-    , Setting.plugin
-    , Echo.plugin
-    , Invite.plugin
-    , Part.plugin
-    , Logger.plugin
-    ]
-
 setting :: Setting
 setting = fromList
-    [ (Protected "nickname", encodeUtf8 "리덈늼")
+    [ (Protected "nickname", nick)
     , (Protected "prefix", nick <> ":")
     , (Global "prefix", "@")
     , (Protected "nickname", nick)
@@ -56,7 +61,7 @@ setting = fromList
 
 main :: IO ()
 main = do
-    (sendingQueue, byebye) <- bot connect nick channels setting plugins
+    (sendingQueue, byebye) <- bot (connect nick channels) setting plugins
 
 #ifndef DEBUG
     lock <- newEmptyMVar

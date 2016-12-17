@@ -8,4 +8,4 @@ import Xnukbot.Plugin.Types (Plugin)
 
 plugin :: Plugin
 plugin = ("Logger", f)
-    where f setting _ msg = (True, T.putStrLn (decodeUtf8 $ showMessage msg) >> return setting)
+    where f setting _ msg = Just (T.putStrLn (decodeUtf8 $ showMessage msg) >> return setting)

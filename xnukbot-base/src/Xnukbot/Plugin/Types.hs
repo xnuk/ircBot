@@ -25,17 +25,20 @@ type MsgChecker = Setting -> (Channel, Nick, ByteString) -> Bool
 type Messager = Setting -> Sender -> Message -> IO Setting
 type MsgMessager = Setting -> Sender -> (Channel, Nick, ByteString) -> IO Setting
 type Sender = [Message] -> IO ()
-type Plugin = (String, Setting -> Sender -> Message -> (Bool, IO Setting))
+type Plugin = (String, Setting -> Sender -> Message -> Maybe (IO Setting))
 
-data PluginWrapper = PluginWrapper
+data PluginWrapper t = PluginWrapper
     { setting :: MVar Setting
-    , plugins :: [Plugin]
+    , plugins :: t Plugin
     , sender  :: Sender
     }
 
 makePlugin :: String -> Checker -> Messager -> Plugin
 makePlugin name checker messager = (name, plug)
-    where plug setting' sender' msg = (checker setting' msg, messager setting' sender' msg)
+    where plug setting' sender' msg =
+            if checker setting' msg
+                then Just $ messager setting' sender' msg
+                else Nothing
 
 fromMsgChecker :: MsgChecker -> Checker
 fromMsgChecker checker setting' (Message (Just (NickName nick _ _)) "PRIVMSG" [chan, msg]) =

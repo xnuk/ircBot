@@ -11,5 +11,6 @@ exe:
     main: Main
     depend:
         base: '<5 && >= 4.7'
+        xnukbot-plugins: ''
     extension:
         - PackageImports
