@@ -22,7 +22,7 @@ import "xnukbot" Xnukbot.IrcBot (bot)
 import "xnukbot" Xnukbot.Plugin.Types (Plugin, Setting, AttrT(Protected, Global))
 
 #define I(Z) import qualified Xnukbot.Plugin.Z
-I(Mueval)
+-- I(Mueval)
 I(Setting.Export)
 I(Simple.Emoji)
 I(Data.Random)
@@ -36,7 +36,7 @@ I(Base.Logger)
 plugins :: Vector Plugin
 plugins = empty
 #define I(Z) `snoc` Xnukbot.Plugin.Z.plugin
-    I(Mueval)
+    -- I(Mueval)
     I(Setting.Export)
     I(Simple.Emoji)
     I(Data.Random)
