@@ -25,6 +25,7 @@ deployment:
         branch: master
         commands:
             - rm -rf ./*; rm -rf ./.stack-work; git checkout --orphan binary; git reset
+            - cp ~/.local/bin/xnukbot $CIRCLE_ARTIFACTS
             - cp ~/.local/bin/xnukbot .; git add xnukbot
 
             - echo MD5-SHA1-SHA256 > checksum; md5sum -b xnukbot >> checksum; sha1sum -b xnukbot >> checksum; sha256sum -b xnukbot >> checksum; git add checksum
