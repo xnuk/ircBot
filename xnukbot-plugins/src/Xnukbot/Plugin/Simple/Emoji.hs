@@ -34,6 +34,8 @@ emojis = fromList . map (fromString *** (<> " ")) $
     , ("\\ㅇㅅㅇ\\",  "/ㅇㅅㅇ/")
     , ("\\(ㅇㅅㅇ",    "ㅇㅅㅇ)/")
     , ("\\ㅇㅅㅇ",    "ㅇㅅㅇ/")
+
+    , ("(?)", "(¿)")
     ]
 
 regexNoPref, regexPref :: Regex
