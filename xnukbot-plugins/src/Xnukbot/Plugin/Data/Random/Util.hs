@@ -4,8 +4,8 @@ module Xnukbot.Plugin.Data.Random.Util (key, choice) where
 import Prelude hiding (lookup)
 import "xnukbot" Xnukbot.Plugin.Types (AttrT(Protected), Attr, Setting)
 import "random" System.Random (newStdGen, randomR)
-import "bytestring" Data.ByteString.Char8 (pack, unpack)
-import "containers" Data.Map.Strict (lookup, insert)
+import "text" Data.Text (pack, unpack)
+import "unordered-containers" Data.HashMap.Strict (lookup, insert)
 import "safe" Safe (readMay)
 
 key :: Attr

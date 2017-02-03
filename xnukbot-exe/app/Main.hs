@@ -2,24 +2,32 @@
 
 module Main where
 
+import Prelude hiding (lookup)
+
+import "yaml" Data.Yaml (decodeFile)
+
 import "text" Data.Text.Encoding (encodeUtf8)
 import qualified "text" Data.Text.IO as T
 
-import Control.Monad (forever)
+import Control.Monad (forever, unless)
 import Data.Monoid ((<>))
 import "stm" Control.Concurrent.STM (atomically)
 import "stm" Control.Concurrent.STM.TQueue (writeTQueue)
-import "containers" Data.Map.Strict (fromList)
+import "unordered-containers" Data.HashMap.Strict (lookup)
 import "unix" System.Posix.Signals (installHandler, keyboardSignal, Handler(CatchOnce), sigINT, emptySignalSet, addSignal)
-import "bytestring" Data.ByteString (ByteString)
+import "directory" System.Directory (doesFileExist)
 import Control.Concurrent (killThread, forkFinally)
 import Control.Concurrent.MVar (newEmptyMVar, putMVar, takeMVar)
 
 import "vector" Data.Vector (Vector, snoc, empty)
 
-import "xnukbot" Xnukbot.Server.Uriirc (connect)
+import "xnukbot" Xnukbot.Server.Znc (connect)
 import "xnukbot" Xnukbot.IrcBot (bot)
-import "xnukbot" Xnukbot.Plugin.Types (Plugin, Setting, AttrT(Protected, Global))
+import "xnukbot" Xnukbot.Plugin.Types (Plugin, fromSemiSetting, Config(Config))
+
+import "xnukbot-plugins" Xnukbot.Plugin.Setting.Export (configPath)
+
+import System.Exit (exitFailure)
 
 #define I(Z) import qualified Xnukbot.Plugin.Z
 -- I(Mueval)
@@ -47,21 +55,17 @@ plugins = empty
     I(Base.Logger)
 #undef I
 
-nick, channels :: ByteString
-nick = encodeUtf8 "리덈늼"
-channels = "#botworld,#botworld2"
-
-setting :: Setting
-setting = fromList
-    [ (Protected "nickname", nick)
-    , (Protected "prefix", nick <> ":")
-    , (Global "prefix", "@")
-    , (Protected "nickname", nick)
-    ]
-
 main :: IO ()
 main = do
-    (sendingQueue, byebye) <- bot (connect nick channels) setting plugins
+    path <- configPath
+    fileExist <- doesFileExist path
+    unless fileExist exitFailure
+    Just semiSetting <- decodeFile path
+    let Config (setting, conf) = fromSemiSetting semiSetting
+        Just password = lookup "password" conf
+        Just id' = lookup "id" conf
+
+    (sendingQueue, byebye) <- bot (connect (encodeUtf8 id') (encodeUtf8 password)) setting plugins
 
 #ifndef DEBUG
     lock <- newEmptyMVar

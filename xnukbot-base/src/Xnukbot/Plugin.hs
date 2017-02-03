@@ -3,16 +3,16 @@ module Xnukbot.Plugin
     ( runPlugin -- Base
 -- Types
     , Sender
-    , Checker, MsgChecker, fromMsgChecker
-    , Messager, MsgMessager, fromMsgMessager
-    , Plugin, makePlugin, makeMsgPlugin, PluginWrapper(..)
+    , Checker
+    , Messager
+    , Plug, Plugin, makePlugin, PluginWrapper(..)
     , AttrT(..), unAttrT, Attr, showAttr, Setting
-    , Message(..), Prefix(..)
+    , MessageT(..), PrefixBiT(..)
     , Channel
 -- Attr
     , getAttribute, getAttributes, hasAttribute, removePrefix
 -- Util
-    , privmsg, privmsgNoPref, privmsgT, privmsgNoPrefT
+    , privmsg, privmsgNoPref
     ) where
 
 import Xnukbot.Plugin.Base (runPlugin)

@@ -1,38 +1,41 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Xnukbot.Plugin.Util (seqOr, privmsg, privmsgNoPref, privmsgT, privmsgNoPrefT) where
+module Xnukbot.Plugin.Util (seqOr, privmsg, privmsgNoPref, part, join) where
 
-import Xnukbot.Plugin.Types (Message)
+import Xnukbot.Plugin.Types (Message, MessageT(Message), Channel)
 
-import Data.Char (ord)
 import Data.Maybe (isJust)
 import Data.Monoid ((<>))
 
-import qualified "irc" Network.IRC.Commands as C (privmsg)
-
-import "bytestring" Data.ByteString (ByteString)
-import qualified "bytestring" Data.ByteString as B
-
 import "text" Data.Text (Text)
 import qualified "text" Data.Text as T
-import "text" Data.Text.Encoding (encodeUtf8)
 
 seqOr :: [Maybe a] -> Maybe [a]
 seqOr xs = case sequence $ filter isJust xs of
     Just [] -> Nothing
     x -> x
 
-privmsg :: ByteString -> ByteString -> ByteString -> Message
-privmsg chan nick = if fromIntegral (B.head chan) == ord '#'
-    then C.privmsg chan . (if nick == "" then id else ((nick <> ": ") <>))
-    else C.privmsg nick
+if' :: Bool -> a -> a -> a
+if' True  a _ = a
+if' False _ a = a
 
-privmsgNoPref :: ByteString -> ByteString -> ByteString -> Message
-privmsgNoPref chan nick = if fromIntegral (B.head chan) == ord '#'
-    then C.privmsg chan
-    else C.privmsg nick
+mkMessage :: a -> [a] -> MessageT a
+mkMessage = Message Nothing
 
-privmsgT :: ByteString -> ByteString -> Text -> [Message]
-privmsgT chan nick = map (privmsg chan nick . encodeUtf8) . T.lines
+privmsg' :: Channel -> Text -> Message
+privmsg' c m = mkMessage "PRIVMSG" [c, m]
 
-privmsgNoPrefT :: ByteString -> ByteString -> Text -> [Message]
-privmsgNoPrefT chan nick = map (privmsgNoPref chan nick . encodeUtf8) . T.lines
+privmsg :: Channel -> Text -> Text -> Message
+privmsg chan nick = if T.head chan == '#'
+    then privmsg' chan . if' (nick == T.empty) id ((nick <> ": ") <>)
+    else privmsg' nick
+
+privmsgNoPref :: Channel -> Text -> Text -> Message
+privmsgNoPref chan nick = if T.head chan == '#'
+    then privmsg' chan
+    else privmsg' nick
+
+part :: Channel -> Message
+part c = mkMessage "PART" [c]
+
+join :: Channel -> Message
+join c = mkMessage "JOIN" [c]

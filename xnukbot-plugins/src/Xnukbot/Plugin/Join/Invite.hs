@@ -2,20 +2,16 @@
 
 module Xnukbot.Plugin.Join.Invite where
 
-import "xnukbot" Xnukbot.Plugin.Types (Checker, Messager, Plugin, makePlugin, Message(..), Prefix(NickName))
-import "xnukbot" Xnukbot.Plugin.Attr (hasAttribute)
+import "xnukbot" Xnukbot.Plugin (hasAttribute, Plug, Plugin, MessageT(..), PrefixBiT(NickName))
+import "xnukbot" Xnukbot.Plugin.Util (join)
 
+import "base" Control.Concurrent (forkIO)
 
-checker :: Checker
-checker setting (Message (Just NickName{}) "INVITE" [_, _]) =
-    not $ hasAttribute "" setting "Invite.disabled"
-checker _ _ = False
-
-messager :: Messager
-messager setting send (Message (Just NickName{}) "INVITE" [_, chan]) = do
-    send [ Message Nothing "JOIN" [chan] ]
-    return setting
-messager _ _ _ = fail "Nope" -- boilerplate...
+plug :: Plug
+plug setting send (Message (Just NickName{}) "INVITE" [_, chan])
+    | hasAttribute "" setting "Invite.disabled" = Nothing
+    | otherwise = Just $ forkIO (send [ join chan ]) >> return setting
+plug _ _ _ = Nothing
 
 plugin :: Plugin
-plugin = makePlugin "Invite" checker messager
+plugin = ("Invite", plug)

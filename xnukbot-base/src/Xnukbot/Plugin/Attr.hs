@@ -4,12 +4,10 @@ module Xnukbot.Plugin.Attr
     , unAttrT, showAttr, getAttribute, getAttributes, hasAttribute, removePrefix
     ) where
 
-import "bytestring" Data.ByteString (ByteString)
-import qualified "bytestring" Data.ByteString as B
 import qualified "text" Data.Text as T
-import "text" Data.Text.Encoding (encodeUtf8, decodeUtf8)
+import "text" Data.Text (Text)
 
-import qualified "containers" Data.Map.Strict as M
+import qualified "unordered-containers" Data.HashMap.Strict as M
 
 import Control.Applicative ((<|>))
 import Data.Maybe (fromMaybe, listToMaybe)
@@ -20,7 +18,7 @@ import Xnukbot.Plugin.Util (seqOr)
 listAttrT :: Channel -> a -> [AttrT a]
 listAttrT chan attr = map ($ attr) [Forced, Protected, Local chan, Global]
 
-attrGet :: Channel -> Setting -> ByteString -> [ByteString]
+attrGet :: Channel -> Setting -> Text -> [Text]
 attrGet chan setting attr = map unAttrT . f . fromMaybe [] . seqOr . map set $ listAttrT chan attr
     where f :: [AttrT a] -> [AttrT a]
           f ( x@(Forced _)   :_  ) = [x]
@@ -28,21 +26,21 @@ attrGet chan setting attr = map unAttrT . f . fromMaybe [] . seqOr . map set $ l
           f ( x@(Local _ _)  :_  ) = [x]
           f ( x@(Global _)   :_  ) = [x]
           f [] = []
-          set :: Attr -> Maybe (AttrT ByteString)
+          set :: Attr -> Maybe (AttrT Text)
           set key = (<$ key) <$> M.lookup key setting
 
-getAttribute :: Channel -> Setting -> ByteString -> Maybe ByteString
+getAttribute :: Channel -> Setting -> Text -> Maybe Text
 getAttribute chan setting = listToMaybe . attrGet chan setting
 
-hasAttribute :: Channel -> Setting -> ByteString -> Bool
+hasAttribute :: Channel -> Setting -> Text -> Bool
 hasAttribute chan setting =
     any (`M.member` setting) . listAttrT chan
 
-getAttributes :: Channel -> Setting -> ByteString -> [ByteString]
-getAttributes c s = map encodeUtf8 . concatMap (T.words . decodeUtf8) . attrGet c s
+getAttributes :: Channel -> Setting -> Text -> [Text]
+getAttributes c s = concatMap T.words . attrGet c s
 
-removePrefix :: Channel -> Setting -> ByteString -> Maybe ByteString
+removePrefix :: Channel -> Setting -> Text -> Maybe Text
 removePrefix chan setting message
     | null prefixes = Nothing
-    | otherwise = foldl (<|>) Nothing $ map (`B.stripPrefix` message) prefixes
+    | otherwise = foldl (<|>) Nothing $ map (`T.stripPrefix` message) prefixes
     where prefixes = getAttributes chan setting "prefix"

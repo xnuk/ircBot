@@ -1,17 +1,17 @@
 {-# LANGUAGE OverloadedStrings, QuasiQuotes #-}
 module Xnukbot.Plugin.Data.Random (plugin) where
 
-import "xnukbot" Xnukbot.Plugin.Types (Plugin, makePlugin, Checker, Messager, Message(Message), Prefix(NickName))
+import "xnukbot" Xnukbot.Plugin.Types (Plugin, makePlugin, Checker, Messager, MessageT(Message), PrefixBiT(NickName))
 import "xnukbot" Xnukbot.Plugin.Attr (removePrefix, hasAttribute)
-import "xnukbot" Xnukbot.Plugin.Util (privmsgT)
+import "xnukbot" Xnukbot.Plugin.Util (privmsg)
 
-import "pcre-heavy" Text.Regex.PCRE.Heavy (re, (=~), Regex)
-import "pcre-light" Text.Regex.PCRE.Light (match)
+import "pcre-heavy" Text.Regex.PCRE.Heavy (re, (=~), Regex, scan)
 
-import "text" Data.Text.Encoding (decodeUtf8)
 import qualified "text" Data.Text as T
 
 import Xnukbot.Plugin.Data.Random.Util (choice)
+
+import Safe (headMay)
 
 regex :: Regex
 regex = [re|^random(.)\1*(.+)$|]
@@ -25,18 +25,17 @@ checker _ _ = False
 messager :: Messager
 messager setting send (Message (Just (NickName nick _ _)) "PRIVMSG" [chan, msg]) =
     case matching of
-        Just (_:del:str:_) -> if null arr then return setting else do
+        Just (_, [del, str]) -> if null arr then return setting else do
             (x, setting') <- choice arr setting
-            send $ privmsgT chan nick x
+            send [ privmsg chan nick x ]
             return setting'
-            where arr = filter (/= T.empty) $ T.split (== delim) strT
-                  delim = T.head $ decodeUtf8 del
-                  strT = decodeUtf8 str
+            where arr = filter (/= T.empty) $ T.split (== T.head del) str
+
         Just _ ->  fail "Regex matching failed"
         Nothing -> fail "Regex matching failed"
     where matching = do
             str <- removePrefix chan setting msg
-            match regex str []
+            headMay (scan regex str)
 messager _ _ _ = fail "Nope"
 
 plugin :: Plugin

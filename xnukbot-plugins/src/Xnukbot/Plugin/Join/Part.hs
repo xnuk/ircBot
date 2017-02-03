@@ -1,21 +1,17 @@
-{-# LANGUAGE QuasiQuotes #-}
+{-# LANGUAGE QuasiQuotes, OverloadedStrings #-}
 
 module Xnukbot.Plugin.Join.Part where
 
-import "xnukbot" Xnukbot.Plugin.Types (MsgChecker, MsgMessager, makeMsgPlugin, Plugin)
-import "xnukbot" Xnukbot.Plugin (removePrefix)
-
-import "irc" Network.IRC.Commands (part)
-
+import "xnukbot" Xnukbot.Plugin (Plug, Plugin, MessageT(Message), PrefixBiT(NickName), removePrefix)
+import "xnukbot" Xnukbot.Plugin.Util (part)
 import "pcre-heavy" Text.Regex.PCRE.Heavy (re, (=~))
-
 import Control.Concurrent (forkIO)
 
-checker :: MsgChecker
-checker setting (chan, _, msg) = maybe False (=~ [re|^part\s*$|]) (removePrefix chan setting msg)
-
-messager :: MsgMessager
-messager setting send (chan, _, _) = forkIO (send [ part chan ]) >> return setting
+plug :: Plug
+plug setting send (Message (Just NickName{}) "PRIVMSG" [chan, msg])
+    | maybe False (=~ [re|^part\s*$|]) (removePrefix chan setting msg) = Just $ forkIO (send [ part chan ]) >> return setting
+    | otherwise = Nothing
+plug _ _ _ = Nothing
 
 plugin :: Plugin
-plugin = makeMsgPlugin "Part" checker messager
+plugin = ("Part", plug)

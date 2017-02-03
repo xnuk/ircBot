@@ -1,29 +1,27 @@
-{-# LANGUAGE QuasiQuotes, OverloadedStrings, MultiWayIf, TupleSections #-}
+{-# LANGUAGE QuasiQuotes, OverloadedStrings, NamedFieldPuns, TupleSections #-}
 module Xnukbot.Plugin.Simple.Emoji where
 
 import Prelude hiding (lookup)
 
 import "text" Data.Text (Text)
-import "bytestring" Data.ByteString (ByteString)
-import "utf8-string" Data.ByteString.UTF8 (fromString)
 
-import "pcre-heavy" Text.Regex.PCRE.Heavy (re, Regex, (=~))
+import "pcre-heavy" Text.Regex.PCRE.Heavy (re, (=~))
 
-import "containers" Data.Map (Map, fromList, lookup, member)
+import "unordered-containers" Data.HashMap.Strict (HashMap, fromList, lookup)
 
-import Control.Arrow ((***))
+import Control.Arrow (second)
 import Data.Monoid ((<>))
 
 import Xnukbot.Plugin.Data.Random.Util (choice)
 
-import "xnukbot" Xnukbot.Plugin.Types (MsgChecker, MsgMessager, makeMsgPlugin, Plugin)
+import "xnukbot" Xnukbot.Plugin (Plugin, Plug, MessageT(Message), PrefixBiT(NickName, nickName), Setting)
 import "xnukbot" Xnukbot.Plugin.Attr (hasAttribute, removePrefix)
-import "xnukbot" Xnukbot.Plugin.Util (privmsgNoPrefT)
+import "xnukbot" Xnukbot.Plugin.Util (privmsgNoPref)
 
 import Control.Concurrent (forkIO)
 
-emojis :: Map ByteString Text
-emojis = fromList . map (fromString *** (<> " ")) $
+emojis :: HashMap Text Text
+emojis = fromList . map (second (<> " ")) $
     [ ("d(ㅇㅅㅇ",    "ㅇㅅㅇ)b")
     , ("ㅇㅅ<",       ">ㅅㅇ")
     , ("/ㅇㅅㅇ)/",   "\\(ㅇㅅㅇ\\")
@@ -37,10 +35,6 @@ emojis = fromList . map (fromString *** (<> " ")) $
 
     , ("(?)", "(¿)")
     ]
-
-regexNoPref, regexPref :: Regex
-regexNoPref = [re|^\(?/?ㅇㅁㅇ\)/ㅛ\s*$|]
-regexPref = [re|^(?:table(?:flip)?|flip|lenny)\s*$|]
 
 tableFlips :: [Text]
 tableFlips =
@@ -59,21 +53,22 @@ tableFlips =
 lenny :: Text
 lenny = "( ͡° ͜ʖ ͡°)"
 
-checker :: MsgChecker
-checker setting (chan, _, msg)
-    = not (hasAttribute chan setting "Emoji.disabled") &&
-    (  msg =~ regexNoPref -- tableflip
-    || maybe False (=~ regexPref) (removePrefix chan setting msg) -- tableflip, lenny
-    || member msg emojis -- reverse emoji
-    )
+plug :: Plug
+plug setting send' (Message (Just NickName{nickName}) "PRIVMSG" [chan, msg])
+    | hasAttribute chan setting "Emoji.disabled" = Nothing
 
-messager :: MsgMessager
-messager setting send (chan, nick, msg) = do
-    (x, setting') <-if | msg =~ [re|lenny\s*$|] -> return (lenny, setting)
-                       | member msg emojis -> maybe (fail "No emoji") (return . (,setting)) $ lookup msg emojis
-                       | otherwise -> choice tableFlips setting
-    forkIO . send $ privmsgNoPrefT chan nick x
-    return setting'
+    | msg =~ [re|^\(?/?ㅇㅁㅇ\)/ㅛ\s*$|] || prefMsg [re|^(?:table(?:flip)?|flip)|] =
+        Just (choice tableFlips setting >>= send)
+
+    | prefMsg [re|^lenny|] = Just (send (lenny, setting))
+    | otherwise = lookup msg emojis >>= Just . send . (,setting)
+
+    where send :: (Text, Setting) -> IO Setting
+          send (x, setting') = forkIO (send' [privmsgNoPref chan nickName x]) >> return setting'
+          prefMsg regex = maybe False (=~ regex) (removePrefix chan setting msg)
+
+plug _ _ _ = Nothing
 
 plugin :: Plugin
-plugin = makeMsgPlugin "Emoji" checker messager
+plugin = ("Emoji", plug)
+

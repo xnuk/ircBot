@@ -19,7 +19,7 @@ lib:
         - Xnukbot.Plugin.Simple.*
         - Xnukbot.Plugin.Join.*
         - Xnukbot.Plugin.Setting.*
-        - Xnukbot.Plugin.Mueval
+          # - Xnukbot.Plugin.Mueval
 
 test:
     name: xnukbot-plugins-test

@@ -7,7 +7,7 @@ category: Web
 
 all:
     depend:
-        base: '<5 && >= 4.7'
+        base: '<5 && >= 4.8'
     extension:
         - PackageImports
 
@@ -16,6 +16,7 @@ lib:
     expose:
         - Xnukbot.Connect.*
         - Xnukbot.Plugin
+        - Xnukbot.Plugin.Simple
         - Xnukbot.Plugin.Base
         - Xnukbot.Plugin.Types
         - Xnukbot.Plugin.Util
@@ -23,8 +24,16 @@ lib:
         - Xnukbot.Plugin.Base.*
         - Xnukbot.Server.*
         - Xnukbot.IrcBot
+        - Network.IRC.Base.Trans
 
 test:
     name: xnukbot-test
     src: test/
     main: Main
+
+exe: # legacy
+    name: server-repl
+    src: exe/
+    main: ServerRepl
+    depend:
+        xnukbot: ''
