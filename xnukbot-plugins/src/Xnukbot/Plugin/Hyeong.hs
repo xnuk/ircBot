@@ -15,7 +15,7 @@ import "pcre-heavy" Text.Regex.PCRE.Heavy (re, Regex)
 
 import "bytestring" Data.ByteString (hGet)
 import "text" Data.Text (Text)
-import qualified "text" Data.Text as T (null)
+import qualified "text" Data.Text as T (null, takeWhile)
 import "text" Data.Text.IO (writeFile)
 import "text" Data.Text.Encoding (decodeUtf8With)
 import System.IO (hClose)
@@ -47,8 +47,9 @@ runHyeong code = do
         putMVar res $ either (const mempty) id x
 
     _ <- forkFinally (threadDelay 5000000 {- 5 sec -}) $ const (hClose hout)
-
-    decodeUtf8With (\_ _ -> Nothing) <$> takeMVar res
+    
+    output <- takeMVar res
+    return . T.takeWhile (\x -> not (x == '\r' || x == '\n')) $ decodeUtf8With (\_ _ -> Nothing) output
 
 plugin :: Plugin
 plugin = simplePlugin "Hyeong" (prefRegex, regex) $ \_ _ _ ->
