@@ -14,6 +14,7 @@ all:
 lib:
     src: src/
     expose:
+        - Xnukbot.Plugin.Hyeong
         - Xnukbot.Plugin.Data.*
         - Xnukbot.Plugin.Data.Random.Util
         - Xnukbot.Plugin.Simple.*

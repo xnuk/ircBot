@@ -10,10 +10,10 @@ cabal-version: 1.12
 
 library
   hs-source-dirs: src/
-  exposed-modules: Xnukbot.Plugin.Data.Random, Xnukbot.Plugin.Data.Random.Util, Xnukbot.Plugin.Join.Invite, Xnukbot.Plugin.Join.Part, Xnukbot.Plugin.Setting.Export, Xnukbot.Plugin.Simple.Emoji
+  exposed-modules: Xnukbot.Plugin.Data.Random, Xnukbot.Plugin.Data.Random.Util, Xnukbot.Plugin.Join.Invite, Xnukbot.Plugin.Join.Part, Xnukbot.Plugin.Setting.Export, Xnukbot.Plugin.Simple.Emoji, Xnukbot.Plugin.Hyeong
   --other-modules: Xnukbot.Plugin.Mueval
   ghc-options: -Wall
-  build-depends: aeson, base >= 4.7 && < 5, bytestring, containers, directory, filepath, irc, pcre-heavy, pcre-light, random, safe, text, unordered-containers, utf8-string, xnukbot, yaml
+  build-depends: aeson, base >= 4.7 && < 5, bytestring, containers, directory, filepath, irc, pcre-heavy, pcre-light, random, safe, text, unordered-containers, utf8-string, xnukbot, yaml, unix, process
   default-language: Haskell2010
   default-extensions: PackageImports
 
