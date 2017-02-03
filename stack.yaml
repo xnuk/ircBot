@@ -1,4 +1,4 @@
-resolver: nightly-2017-01-25
+resolver: nightly-2017-02-03
 packages:
     - xnukbot-base/
     - xnukbot-plugins/
