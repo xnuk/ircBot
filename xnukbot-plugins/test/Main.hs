@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings, PackageImports #-}
-module Main where
+{-module Main where
 
 import "hspec" Test.Hspec
 import qualified "xnukbot-plugins" Xnukbot.Plugin.Mueval as Mueval
@@ -33,4 +33,4 @@ msgPlugTest plugin setting message send = do
 
     fromMaybe (fail (name ++ ": checker does not match")) g
     a <- takeMVar m
-    a `shouldBe` Nothing
+    a `shouldBe` Nothing-}

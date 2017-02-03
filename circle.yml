@@ -16,9 +16,9 @@ dependencies:
 test:
     override:
         - stack install
-        - stack test || true # very awkward
-        - stack runhaskell ./xnukbot-base/test/Main.hs
-        - stack runhaskell ./xnukbot-plugins/test/Main.hs
+          #- stack test || true # very awkward
+          #- stack runhaskell ./xnukbot-base/test/Main.hs
+          #- stack runhaskell ./xnukbot-plugins/test/Main.hs
 
 deployment:
     upload:

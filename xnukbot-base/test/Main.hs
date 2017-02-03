@@ -6,7 +6,7 @@ import "hspec" Test.Hspec
 import "pcre-heavy" Text.Regex.PCRE.Heavy (re, (=~))
 import "pcre-light" Text.Regex.PCRE.Light (match)
 import "bytestring" Data.ByteString (ByteString)
-import qualified "containers" Data.Map.Strict as M
+import qualified "unordered-containers" Data.HashMap.Strict as M
 
 import qualified "xnukbot" Xnukbot.Plugin.Base.Setting as Setting
 import "xnukbot" Xnukbot.Plugin (AttrT(..), getAttribute, getAttributes)

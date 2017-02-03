@@ -28,7 +28,7 @@ test-suite xnukbot-test
   type: exitcode-stdio-1.0
   hs-source-dirs: test/
   main-is: Main.hs
-  build-depends: base <5 && >= 4.8, bytestring, containers, hspec, pcre-heavy, pcre-light, xnukbot
+  build-depends: base <5 && >= 4.8, bytestring, hspec, pcre-heavy, pcre-light, unordered-containers, xnukbot
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   default-language: Haskell2010
   default-extensions: PackageImports
