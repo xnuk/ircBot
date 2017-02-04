@@ -10,7 +10,7 @@ exe:
     src: app/
     main: Main
     depend:
-        base: '<5 && >= 4.7'
+        base: '<5 && >= 4.8'
         xnukbot-plugins: ''
     extension:
         - PackageImports
