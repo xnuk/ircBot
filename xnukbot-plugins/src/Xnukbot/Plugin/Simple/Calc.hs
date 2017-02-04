@@ -120,17 +120,23 @@ parser :: Text -> Either String (Maybe Rational)
 parser = parseOnly expression . T.strip
 
 plugin :: Plugin
-plugin = simplePlugin "Calc" ([re|^(hex|dec|oct|bin)$|], [re|^\s*((?:-?(?:l[ngb])\s*\d+(?:\.\d+)?|(?:-?\d+(?:\.\d+)?|pi)\s*[\-\+\^\*/\+]).*)\s*$|]) $ \_ _ _ x -> case x of
-    Right [y] -> case parser y of
-        Right (Just z) ->
-            let n = numerator z
-                d = denominator z
-                ratio = T.pack (show n) <> "/" <> T.pack (show d)
-                real = T.pack (show (fromInteger n / fromInteger d :: Double))
-                output = if isExp10 d || T.length ratio > 30
-                    then real
-                    else real <> " = " <> ratio
-            in return [output]
-        _ -> return []
-    _ -> return []
+plugin = simplePlugin "Calc" ([re|^(?:(hex|dec|oct|bin)|calc (.+))$|], [re|^\s*(\(?\s*(?:-?(?:l[ngb])\s*\(?\s*\d+(?:\.\d+)?|\(?\s*(?:-?\d+(?:\.\d+)?|pi)\s*[\-\+\^\*/\+]).*)\s*$|]) $ \_ _ _ -> f
+    where
+        f x = case x of
+            Right [y] -> return $ parse y
+            Left ["", y] -> return $ parse y
+            _ -> return []
+
+        parse x = case parser x of
+            Right (Just z) ->
+                let n = numerator z
+                    d = denominator z
+                    ratio = T.pack (show n) <> "/" <> T.pack (show d)
+                    real = T.pack (show (fromInteger n / fromInteger d :: Double))
+                    output = if isExp10 d || T.length ratio > 30
+                        then real
+                        else real <> " = " <> ratio
+                in [output]
+            _ -> []
+
 
