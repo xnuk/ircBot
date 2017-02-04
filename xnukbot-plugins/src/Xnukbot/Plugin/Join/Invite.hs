@@ -2,7 +2,7 @@
 
 module Xnukbot.Plugin.Join.Invite where
 
-import "xnukbot" Xnukbot.Plugin (hasAttribute, Plug, Plugin, MessageT(..), PrefixBiT(NickName))
+import "xnukbot" Xnukbot.Plugin (hasAttribute, Plug, Plugin, MessageT(..), PrefixT(NickName))
 import "xnukbot" Xnukbot.Plugin.Util (join)
 
 import "base" Control.Concurrent (forkIO)

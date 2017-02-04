@@ -10,7 +10,7 @@ import Data.List (intersperse)
 import Safe (headMay)
 
 import Xnukbot.Plugin.Types
-    ( MessageT(..), Message, PrefixBiT(NickName)
+    ( MessageT(..), Message, PrefixT(NickName)
     , Plugin, Setting, Sender, AttrT(..), Attr
     , makePlugin
     )

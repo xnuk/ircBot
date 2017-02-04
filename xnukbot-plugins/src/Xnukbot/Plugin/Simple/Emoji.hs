@@ -14,7 +14,7 @@ import Data.Monoid ((<>))
 
 import Xnukbot.Plugin.Data.Random.Util (choice)
 
-import "xnukbot" Xnukbot.Plugin (Plugin, Plug, MessageT(Message), PrefixBiT(NickName, nickName), Setting)
+import "xnukbot" Xnukbot.Plugin (Plugin, Plug, MessageT(Message), PrefixT(NickName, nickName), Setting)
 import "xnukbot" Xnukbot.Plugin.Attr (hasAttribute, removePrefix)
 import "xnukbot" Xnukbot.Plugin.Util (privmsgNoPref)
 

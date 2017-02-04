@@ -3,7 +3,7 @@ module Xnukbot.Plugin.Setting.Export (configPath, plugin) where
 
 import Prelude hiding (writeFile, head)
 
-import "xnukbot" Xnukbot.Plugin (Plug, Plugin, MessageT(..), PrefixBiT(NickName), removePrefix, privmsgNoPref)
+import "xnukbot" Xnukbot.Plugin (Plug, Plugin, MessageT(..), PrefixT(NickName), removePrefix, privmsgNoPref)
 import "xnukbot" Xnukbot.Plugin.Types (Config(Config), SemiSetting(semiConfig), toSemiSetting)
 import "yaml" Data.Yaml (encodeFile, decodeFileEither)
 import "directory" System.Directory (XdgDirectory(XdgConfig), getXdgDirectory, createDirectoryIfMissing, doesFileExist)

@@ -1,7 +1,7 @@
 {-# LANGUAGE NamedFieldPuns, OverloadedStrings #-}
 module Xnukbot.Plugin.Simple (simplePlugin) where
 
-import Xnukbot.Plugin (MessageT(Message), PrefixBiT(..), Channel, Plugin, Plug, Setting, privmsgNoPref, privmsg, hasAttribute, removePrefix)
+import Xnukbot.Plugin (MessageT(Message), PrefixT(..), Channel, Plugin, Plug, Setting, privmsgNoPref, privmsg, hasAttribute, removePrefix)
 import "pcre-heavy" Text.Regex.PCRE.Heavy (Regex, scan)
 import "text" Data.Text (Text, pack)
 import "base" Control.Concurrent (forkIO)

@@ -7,7 +7,7 @@ module Xnukbot.Plugin
     , Messager
     , Plug, Plugin, makePlugin, PluginWrapper(..)
     , AttrT(..), unAttrT, Attr, showAttr, Setting
-    , MessageT(..), PrefixBiT(..)
+    , MessageT(..), PrefixT(..)
     , Channel
 -- Attr
     , getAttribute, getAttributes, hasAttribute, removePrefix

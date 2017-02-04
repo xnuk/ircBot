@@ -5,7 +5,7 @@ import "pcre-heavy" Text.Regex.PCRE.Heavy ((=~), re, sub, Regex)
 import "bytestring" Data.ByteString (empty)
 import Data.Maybe (fromJust)
 
-import Xnukbot.Plugin.Types (Plugin, Plug, MessageT(..), PrefixBiT(NickName))
+import Xnukbot.Plugin.Types (Plugin, Plug, MessageT(..), PrefixT(NickName))
 import Xnukbot.Plugin.Attr (hasAttribute, removePrefix)
 import Xnukbot.Plugin.Util (privmsg)
 

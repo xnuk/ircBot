@@ -40,11 +40,10 @@ This code also redistributed by Xnuk Shuman with BSD-3-Clause.
 -}
 
 {-# LANGUAGE NamedFieldPuns #-}
-module Network.IRC.Base.Trans (PrefixBiT(..), PrefixT, MessageT(..), fromByteString, showMessage) where
+module Network.IRC.Base.Trans (PrefixT(..), MessageT(..), fromByteString, showMessage) where
 
 import qualified "irc" Network.IRC.Base as I
 import "bytestring" Data.ByteString (ByteString, singleton, empty, cons, snoc, intercalate)
-import "base" Data.Bifunctor (Bifunctor(bimap))
 import "base" Data.Monoid ((<>))
 import "base" Data.Char (ord)
 import "base" Data.Word (Word8)
@@ -52,8 +51,8 @@ import "base" Data.Word (Word8)
 fromChar :: Char -> Word8
 fromChar = fromIntegral . ord
 
-data PrefixBiT b a
-    = Server b
+data PrefixT a
+    = Server a
     | NickName
         { nickName :: a
         , userName :: Maybe a
@@ -61,11 +60,9 @@ data PrefixBiT b a
         }
     deriving Eq
 
-type PrefixT a = PrefixBiT a a
-
-instance Bifunctor PrefixBiT where
-    bimap f _ (Server a) = Server (f a)
-    bimap _ f (NickName a b c) = NickName (f a) (f <$> b) (f <$> c)
+instance Functor PrefixT where
+    fmap f (Server a) = Server (f a)
+    fmap f (NickName a b c) = NickName (f a) (f <$> b) (f <$> c)
 
 data MessageT a = Message
     { msgPrefix :: Maybe (PrefixT a)
@@ -75,7 +72,7 @@ data MessageT a = Message
 
 instance Functor MessageT where
     fmap f Message{msgPrefix, msgCommand, msgParams} = Message
-        { msgPrefix = bimap f f <$> msgPrefix
+        { msgPrefix = fmap f <$> msgPrefix
         , msgCommand = f msgCommand
         , msgParams = map f msgParams
         }

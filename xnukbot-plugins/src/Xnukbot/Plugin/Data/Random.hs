@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings, QuasiQuotes #-}
 module Xnukbot.Plugin.Data.Random (plugin) where
 
-import "xnukbot" Xnukbot.Plugin.Types (Plugin, makePlugin, Checker, Messager, MessageT(Message), PrefixBiT(NickName))
+import "xnukbot" Xnukbot.Plugin.Types (Plugin, makePlugin, Checker, Messager, MessageT(Message), PrefixT(NickName))
 import "xnukbot" Xnukbot.Plugin.Attr (removePrefix, hasAttribute)
 import "xnukbot" Xnukbot.Plugin.Util (privmsg)
 

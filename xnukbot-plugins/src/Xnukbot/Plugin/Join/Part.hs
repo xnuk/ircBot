@@ -2,7 +2,7 @@
 
 module Xnukbot.Plugin.Join.Part where
 
-import "xnukbot" Xnukbot.Plugin (Plug, Plugin, MessageT(Message), PrefixBiT(NickName), removePrefix)
+import "xnukbot" Xnukbot.Plugin (Plug, Plugin, MessageT(Message), PrefixT(NickName), removePrefix)
 import "xnukbot" Xnukbot.Plugin.Util (part)
 import "pcre-heavy" Text.Regex.PCRE.Heavy (re, (=~))
 import Control.Concurrent (forkIO)

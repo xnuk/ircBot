@@ -5,13 +5,13 @@ module Xnukbot.Plugin.Types
     , Messager --, MsgMessager, fromMsgMessager
     , Plugin, Plug, makePlugin, {-makeMsgPlugin-} PluginWrapper(..)
     , AttrT(..), unAttrT, Attr, showAttr, Setting
-    , MessageT(..), Message, PrefixBiT(..), Prefix
+    , MessageT(..), Message, PrefixT(..), Prefix
     , Channel
     , Config(Config)
     , SemiSetting(..), toSemiSetting, fromSemiSetting
     ) where
 
-import Network.IRC.Base.Trans (MessageT(..), PrefixBiT(..), PrefixT)
+import Network.IRC.Base.Trans (MessageT(..), PrefixT(..))
 import "text" Data.Text (Text)
 import "unordered-containers" Data.HashMap.Strict (HashMap, foldrWithKey, union, unions, insert)
 import qualified "unordered-containers" Data.HashMap.Strict as M

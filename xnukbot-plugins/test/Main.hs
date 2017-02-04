@@ -1,4 +1,6 @@
 {-# LANGUAGE OverloadedStrings, PackageImports #-}
+module Main where
+main = return ()
 {-module Main where
 
 import "hspec" Test.Hspec
