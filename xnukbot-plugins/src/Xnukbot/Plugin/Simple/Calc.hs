@@ -10,6 +10,9 @@ import Data.Char (isDigit, isSpace)
 import Data.Ratio (Rational, approxRational, (%), numerator, denominator)
 import Data.Monoid ((<>))
 
+import Control.Concurrent (forkFinally, threadDelay, killThread)
+import Control.Concurrent.MVar (newEmptyMVar, takeMVar, putMVar)
+
 import "xnukbot" Xnukbot.Plugin (Plugin)
 import "xnukbot" Xnukbot.Plugin.Simple (simplePlugin)
 
@@ -107,8 +110,9 @@ prefixDouble s f = Prefix (operatorStr s *> pure (>>= calcDoubleUnary f))
 table :: [[Operator Text (Maybe Rational)]]
 table =
     [ [ prefix '-' negate, prefix '+' id ]
+    , [ binary 'e' . lift $ \a b -> a * fromInteger (exp10 . fromInteger $ numerator b) ]
     , [ binary '^' $ calcDoubleBinary (**) ]
-    , [ prefixDouble "ln" log, prefixDouble "lg" (logBase 10), prefixDouble "lb" (logBase 2) ]
+    , [ prefixDouble "exp" exp, prefixDouble "ln" log, prefixDouble "lg" (logBase 10), prefixDouble "lb" (logBase 2) ]
     , [ binary '*' $ lift (*), binary '/' $ \a b -> if b == 0 then Nothing else Just (a/b) ]
     , [ binary '+' $ lift (+), binary '-' $ lift (-) ]
     ]
@@ -119,13 +123,28 @@ expression = buildExpressionParser table $ paren <|> number
 parser :: Text -> Either String (Maybe Rational)
 parser = parseOnly expression . T.strip
 
+timeout :: Int -> IO [a] -> IO [a]
+timeout ms x = do
+    mvar <- newEmptyMVar
+    th <- forkFinally x $ \z -> putMVar mvar $ case z of
+        Left _ -> []
+        Right a -> a
+    forkFinally (threadDelay $ ms * 1000) $ \_ -> do
+        killThread th
+        putMVar mvar []
+
+    takeMVar mvar
+
+
 plugin :: Plugin
-plugin = simplePlugin "Calc" ([re|^(?:(hex|dec|oct|bin)|calc (.+))$|], [re|^\s*(\(?\s*(?:-?(?:l[ngb])\s*\(?\s*\d+(?:\.\d+)?|\(?\s*(?:-?\d+(?:\.\d+)?|pi)\s*[\-\+\^\*/\+]).*)\s*$|]) $ \_ _ _ -> f
+plugin = simplePlugin "Calc" ([re|^(?:(hex|dec|oct|bin)|calc (.+))$|], [re|^\s*(\(?\s*(?:-?(?:l[ngb]|exp)\s*\(?\s*\d+(?:\.\d+)?|\(?\s*(?:-?\d+(?:\.\d+)?|pi|e)\s*[\-\+\^\*/\+]).*)\s*$|]) $ \_ _ _ -> f
     where
         f x = case x of
-            Right [y] -> return $ parse y
-            Left ["", y] -> return $ parse y
+            Right [y]    -> parseTimeout y
+            Left ["", y] -> parseTimeout y
             _ -> return []
+
+        parseTimeout = timeout 5000 . return . parse
 
         parse x = case parser x of
             Right (Just z) ->
