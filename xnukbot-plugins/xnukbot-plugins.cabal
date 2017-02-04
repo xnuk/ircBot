@@ -12,7 +12,7 @@ library
   hs-source-dirs: src/
   exposed-modules: Xnukbot.Plugin.Data.Random, Xnukbot.Plugin.Data.Random.Util, Xnukbot.Plugin.Hyeong, Xnukbot.Plugin.Join.Invite, Xnukbot.Plugin.Join.Part, Xnukbot.Plugin.Setting.Export, Xnukbot.Plugin.Simple.Calc, Xnukbot.Plugin.Simple.Emoji
   ghc-options: -Wall
-  build-depends: attoparsec, attoparsec-expr, base >= 4.8 && < 5, bytestring, directory, filepath, pcre-heavy, process, random, safe, text, unix, unordered-containers, xnukbot, yaml
+  build-depends: attoparsec, attoparsec-expr, base >= 4.8 && < 5, bytestring, deepseq, directory, filepath, pcre-heavy, process, random, safe, text, unix, unordered-containers, xnukbot, yaml
   default-language: Haskell2010
   default-extensions: PackageImports
 

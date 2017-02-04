@@ -9,9 +9,11 @@ import Control.Applicative ((<|>))
 import Data.Char (isDigit, isSpace)
 import Data.Ratio (Rational, approxRational, (%), numerator, denominator)
 import Data.Monoid ((<>))
+import Data.Maybe (fromMaybe)
 
-import Control.Concurrent (forkFinally, threadDelay, killThread)
-import Control.Concurrent.MVar (newEmptyMVar, takeMVar, putMVar)
+import System.Timeout (timeout)
+import Control.Exception (evaluate)
+import "deepseq" Control.DeepSeq (force)
 
 import "xnukbot" Xnukbot.Plugin (Plugin)
 import "xnukbot" Xnukbot.Plugin.Simple (simplePlugin)
@@ -123,28 +125,15 @@ expression = buildExpressionParser table $ paren <|> number
 parser :: Text -> Either String (Maybe Rational)
 parser = parseOnly expression . T.strip
 
-timeout :: Int -> IO [a] -> IO [a]
-timeout ms x = do
-    mvar <- newEmptyMVar
-    th <- forkFinally x $ \z -> putMVar mvar $ case z of
-        Left _ -> []
-        Right a -> a
-    forkFinally (threadDelay $ ms * 1000) $ \_ -> do
-        killThread th
-        putMVar mvar []
-
-    takeMVar mvar
-
-
 plugin :: Plugin
-plugin = simplePlugin "Calc" ([re|^(?:(hex|dec|oct|bin)|calc (.+))$|], [re|^\s*(\(?\s*(?:-?(?:l[ngb]|exp)\s*\(?\s*\d+(?:\.\d+)?|\(?\s*(?:-?\d+(?:\.\d+)?|pi|e)\s*[\-\+\^\*/\+]).*)\s*$|]) $ \_ _ _ -> f
+plugin = simplePlugin "Calc" ([re|^calc\s+(.+)\s*$|], [re|^\s*(\(?\s*(?:-?(?:l[ngb]|exp)\s*\(?\s*\d+(?:\.\d+)?|\(?\s*(?:-?\d+(?:\.\d+)?|pi|e)\s*[\-\+\^\*/\+]).*)\s*$|]) $ \_ _ _ -> f
     where
         f x = case x of
-            Right [y]    -> parseTimeout y
-            Left ["", y] -> parseTimeout y
+            Right [y] -> parseTimeout y
+            Left [y] -> parseTimeout y
             _ -> return []
 
-        parseTimeout = timeout 5000 . return . parse
+        parseTimeout = fmap (fromMaybe []) . timeout 5000000 . evaluate . force . parse
 
         parse x = case parser x of
             Right (Just z) ->
