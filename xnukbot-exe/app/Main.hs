@@ -41,6 +41,7 @@ I(Simple.Calc)
 I(Base.Echo)
 I(Join.Invite)
 I(Join.Part)
+I(Mode.DeclineOp)
 I(Base.Logger)
 #undef I
 
@@ -58,6 +59,7 @@ plugins = empty
     I(Base.Echo)
     I(Join.Invite)
     I(Join.Part)
+    I(Mode.DeclineOp)
     I(Base.Logger)
 #undef I
 

@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Xnukbot.Plugin.Util (seqOr, privmsg, privmsgNoPref, part, join, me) where
+module Xnukbot.Plugin.Util (seqOr, privmsg, privmsgNoPref, part, join, me, op, deop, voice, devoice) where
 
 import Xnukbot.Plugin.Types (Message, MessageT(Message), Channel)
 
@@ -46,3 +46,16 @@ part c = mkMessage "PART" [c]
 
 join :: Channel -> Message
 join c = mkMessage "JOIN" [c]
+
+makeOp :: Char -> Char -> Channel -> [Text] -> [Message]
+makeOp _ _ _ [] = []
+makeOp plus oper chan (a:b:c:d:nicks) =
+    mkMessage "MODE" [chan, plus `T.cons` T.pack (replicate 4              oper), T.unwords [a, b, c, d]] : makeOp plus oper chan nicks
+makeOp plus oper chan nicks = return $
+    mkMessage "MODE" [chan, plus `T.cons` T.pack (replicate (length nicks) oper), T.unwords nicks]
+
+op, deop, voice, devoice :: Channel -> [Text] -> [Message]
+op      = makeOp '+' 'o'
+deop    = makeOp '-' 'o'
+voice   = makeOp '+' 'v'
+devoice = makeOp '-' 'v'

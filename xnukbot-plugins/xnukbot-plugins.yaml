@@ -21,6 +21,7 @@ lib:
         - Xnukbot.Plugin.Join.*
         - Xnukbot.Plugin.Setting.*
         - Xnukbot.Plugin.Ignore
+        - Xnukbot.Plugin.Mode.*
           # - Xnukbot.Plugin.Mueval
 
 test:
