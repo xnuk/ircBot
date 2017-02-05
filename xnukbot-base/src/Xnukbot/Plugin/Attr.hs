@@ -1,7 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Xnukbot.Plugin.Attr
     ( AttrT(..), Attr, Setting
-    , unAttrT, showAttr, getAttribute, getAttributes, hasAttribute, removePrefix
+    , unAttrT, showAttr
+    , getAttribute, getAttributes, hasAttribute, setAttribute, appendAttribute, modifyAttribute, modifyAttributes
+    , getAttr, getAttrs, hasAttr, setAttr, appendAttr, modifyAttr, modifyAttrs
+    , removePrefix
     ) where
 
 import qualified "text" Data.Text as T
@@ -29,15 +32,34 @@ attrGet chan setting attr = map unAttrT . f . fromMaybe [] . seqOr . map set $ l
           set :: Attr -> Maybe (AttrT Text)
           set key = (<$ key) <$> M.lookup key setting
 
-getAttribute :: Channel -> Setting -> Text -> Maybe Text
+getAttr, getAttribute :: Channel -> Setting -> Text -> Maybe Text
+getAttr = getAttribute
 getAttribute chan setting = listToMaybe . attrGet chan setting
 
-hasAttribute :: Channel -> Setting -> Text -> Bool
+setAttr, setAttribute :: Attr -> Text -> Setting -> Setting
+setAttr = setAttribute
+setAttribute = M.insert
+
+hasAttr, hasAttribute :: Channel -> Setting -> Text -> Bool
+hasAttr = hasAttribute
 hasAttribute chan setting =
     any (`M.member` setting) . listAttrT chan
 
-getAttributes :: Channel -> Setting -> Text -> [Text]
+getAttrs, getAttributes :: Channel -> Setting -> Text -> [Text]
+getAttrs = getAttributes
 getAttributes c s = concatMap T.words . attrGet c s
+
+appendAttr, appendAttribute :: Attr -> [Text] -> Setting -> Setting
+appendAttr = appendAttribute
+appendAttribute k vs = M.insertWith (\new old -> old `T.append` T.cons ' ' new) k (T.unwords vs)
+
+modifyAttr, modifyAttribute :: Attr -> (Text -> Text) -> Setting -> Setting
+modifyAttr = modifyAttribute
+modifyAttribute k f = M.adjust f k
+
+modifyAttrs, modifyAttributes :: Attr -> ([Text] -> [Text]) -> Setting -> Setting
+modifyAttrs = modifyAttributes
+modifyAttributes k f = M.adjust (T.unwords . f . T.words) k
 
 removePrefix :: Channel -> Setting -> Text -> Maybe Text
 removePrefix chan setting message

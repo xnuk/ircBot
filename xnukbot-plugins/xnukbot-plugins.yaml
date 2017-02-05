@@ -20,6 +20,7 @@ lib:
         - Xnukbot.Plugin.Simple.*
         - Xnukbot.Plugin.Join.*
         - Xnukbot.Plugin.Setting.*
+        - Xnukbot.Plugin.Ignore
           # - Xnukbot.Plugin.Mueval
 
 test:

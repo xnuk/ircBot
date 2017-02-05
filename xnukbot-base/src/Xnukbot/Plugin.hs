@@ -10,9 +10,11 @@ module Xnukbot.Plugin
     , MessageT(..), PrefixT(..)
     , Channel
 -- Attr
-    , getAttribute, getAttributes, hasAttribute, removePrefix
+    , getAttribute, getAttributes, hasAttribute, setAttribute, appendAttribute, modifyAttribute, modifyAttributes
+    , getAttr, getAttrs, hasAttr, setAttr, appendAttr, modifyAttr, modifyAttrs
+    , removePrefix
 -- Util
-    , privmsg, privmsgNoPref
+    , privmsg, privmsgNoPref, me
     ) where
 
 import Xnukbot.Plugin.Base (runPlugin)

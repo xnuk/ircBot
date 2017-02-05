@@ -54,7 +54,7 @@ decimal = (fromInteger . read) <$> digits
 double :: Parser Rational
 double = do
     a <- digits
-    char '.'
+    _ <- char '.'
     b <- digits
     return $ read (a ++ b) % exp10 (length b)
 
@@ -67,11 +67,11 @@ if' False _ a = a
 
 paren :: Parser (Maybe Rational)
 paren = do
-    char '('
+    _ <- char '('
     skipWhile isSpace
     x <- expression
     skipWhile isSpace
-    char ')'
+    _ <- char ')'
     return x
 
 operator :: Char -> Parser ()
