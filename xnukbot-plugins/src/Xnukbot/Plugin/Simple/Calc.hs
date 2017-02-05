@@ -140,7 +140,9 @@ plugin = simplePlugin "Calc" ([re|^calc\s+(.+)\s*$|], [re|^\s*(\(?\s*(?:-?(?:l[n
                 let n = numerator z
                     d = denominator z
                     ratio = T.pack (show n) <> "/" <> T.pack (show d)
-                    real = T.pack (show (fromInteger n / fromInteger d :: Double))
+                    real = T.pack $ if d == 1
+                        then show n
+                        else show (fromInteger n / fromInteger d :: Double)
                     output = if isExp10 d || T.length ratio > 30
                         then real
                         else real <> " = " <> ratio
