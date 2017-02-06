@@ -8,14 +8,14 @@ dependencies:
         - ~/.stack
     override:
         - mkdir -p ~/.local; ln -s $HOME/bin ~/.local/bin
-        - sudo apt-get update && sudo apt-get install pkg-config perl
+        - sudo apt-get update && sudo apt-get install pkg-config perl llvm-3.7
         - perl nightly.pl
         - curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/bin '*/stack'
-        - stack install --only-dependencies --install-ghc
+        - stack install --only-dependencies --install-ghc --ghc-options=-fllvm
 
 test:
     override:
-        - stack install
+        - stack install --ghc-options=-fllvm
           #- stack test || true # very awkward
           #- stack runhaskell ./xnukbot-base/test/Main.hs
           #- stack runhaskell ./xnukbot-plugins/test/Main.hs
