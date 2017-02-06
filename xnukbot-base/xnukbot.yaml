@@ -10,6 +10,7 @@ all:
         base: '<5 && >= 4.8'
     extension:
         - PackageImports
+        - ApplicativeDo
 
 lib:
     src: src/
