@@ -1,17 +1,17 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Xnukbot.Plugin.Mode.DeclineOp (plugin) where
 
-import Prelude hiding (words, lookup)
+import Prelude hiding (lookup)
 
 import "xnukbot" Xnukbot.Plugin (MessageT(Message), PrefixT(NickName), Plugin, Plug, hasAttr, AttrT(Protected))
 import "xnukbot" Xnukbot.Plugin.Util (deop, voice)
-import "text" Data.Text (isPrefixOf, words)
+import "text" Data.Text (isPrefixOf)
 import "unordered-containers" Data.HashMap.Strict (lookup)
 import Control.Concurrent (forkIO)
 import Data.Maybe (isJust, fromJust)
 
 plug :: Plug
-plug setting send (Message (Just NickName{}) "MODE" [chan, mode, nicks])
+plug setting send (Message (Just NickName{}) "MODE" (chan : mode : nicks))
     | hasAttr chan setting "DeclineOp.disabled" = Nothing
     | "+o" `isPrefixOf` mode && isJust nickIfMe = Just $ do
         let myNick = fromJust nickIfMe
@@ -19,7 +19,7 @@ plug setting send (Message (Just NickName{}) "MODE" [chan, mode, nicks])
         return setting
     | otherwise = Nothing
     where nickIfMe = case lookup (Protected "nickname") setting of
-            Just nick -> if nick `elem` words nicks then Just nick else Nothing
+            Just nick -> if nick `elem` nicks then Just nick else Nothing
             Nothing -> Nothing
 
 plug _ _ _ = Nothing
