@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Xnukbot.Plugin.Mueval where
+--module Xnukbot.Plugin.Mueval where
 
 import "bytestring" Data.ByteString (ByteString)
 import qualified "bytestring" Data.ByteString as B
