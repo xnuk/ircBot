@@ -5,8 +5,8 @@ import Prelude hiding (writeFile)
 
 import "unix" System.Posix.Temp (mkstemp)
 import "directory" System.Directory (removeFile)
-import "process" System.Process (createProcess, proc, CreateProcess(std_in, std_out, std_err, close_fds), StdStream(CreatePipe, NoStream), terminateProcess)
-import "base" Control.Concurrent (forkFinally, threadDelay)
+import "process" System.Process (createProcess, proc, CreateProcess(std_in, std_out, std_err, close_fds), StdStream(CreatePipe, NoStream), terminateProcess, waitForProcess)
+import "base" Control.Concurrent (forkFinally, forkIO, threadDelay)
 import "base" Control.Concurrent.MVar (newEmptyMVar, putMVar, takeMVar)
 
 import "xnukbot" Xnukbot.Plugin (Plugin)
@@ -16,10 +16,10 @@ import "pcre-heavy" Text.Regex.PCRE.Heavy (re, Regex)
 import "bytestring" Data.ByteString (hGet)
 import "text" Data.Text (Text)
 import qualified "text" Data.Text as T (null, takeWhile)
-import "text" Data.Text.IO (writeFile)
+import "text" Data.Text.IO (hPutStr)
 import "text" Data.Text.Encoding (decodeUtf8With)
-import System.IO (hClose)
-import Control.Exception (catch, SomeException)
+import System.IO (hClose, hSetBinaryMode)
+import Control.Exception (bracket, catch, SomeException)
 
 regex, prefRegex :: Regex
 regex = [re|^\s*((?:(?:[형항핫흣흡흑]|혀어*엉|하아*[앙앗]|흐으*[읏읍윽])[\.…⋯⋮]*[!\?♥❤💕💖💗💘💙💚💛💜💝♡]*\s*)+)$|]
@@ -28,28 +28,38 @@ prefRegex = [re|^hyeong\s*(.+)\s*$|]
 
 runHyeong :: Text -> IO Text
 runHyeong code = do
-    (path, h) <- mkstemp "/tmp/hyeong"
-    hClose h -- this handle sucks
-    writeFile path code
+    path <- bracket (mkstemp "/tmp/hyeong") (hClose . snd) $ \ (path, h) -> do
+        hSetBinaryMode h False
+        hPutStr h code
+        return path
 
-    (_, Just hout, _, process) <- createProcess (proc "rshyeong" [path])
-        { std_in = NoStream
-        , std_out = CreatePipe
-        , std_err = NoStream
-        , close_fds = True
-        }
+    bracket (launchImpl path) (closeImpl path) $ \ (hout, process) -> do
+        res <- newEmptyMVar
+        _ <- forkFinally (hGet hout 600) $
+            putMVar res . either (const mempty) id
 
-    res <- newEmptyMVar
-    _ <- forkFinally (hGet hout 600) $ \x -> do
+        forkIO $ do
+            threadDelay 5000000 -- 5 sec
+            terminateProcess process
+
+        output <- takeMVar res
+        return . T.takeWhile (\x -> x /= '\r' && x /= '\n') $ decodeUtf8With (\_ _ -> Nothing) output
+
+  where
+    launchImpl path = do
+        (_, Just hout, _, process) <- createProcess (proc "rshyeong" [path])
+            { std_in = NoStream
+            , std_out = CreatePipe
+            , std_err = NoStream
+            , close_fds = True
+            }
+        return (hout, process)
+
+    closeImpl path (hout, process) = do
         hClose hout
-        terminateProcess process
+        waitForProcess process
         catch (removeFile path) $ \e -> print (e :: SomeException)
-        putMVar res $ either (const mempty) id x
 
-    _ <- forkFinally (threadDelay 5000000 {- 5 sec -}) $ const (hClose hout)
-    
-    output <- takeMVar res
-    return . T.takeWhile (\x -> not (x == '\r' || x == '\n')) $ decodeUtf8With (\_ _ -> Nothing) output
 
 plugin :: Plugin
 plugin = simplePlugin "Hyeong" (prefRegex, regex) $ \_ _ _ ->
