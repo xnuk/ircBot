@@ -6,6 +6,9 @@ import Prelude hiding (writeFile)
 import "unix" System.Posix.Temp (mkstemp)
 import "directory" System.Directory (removeFile)
 import "process" System.Process (createProcess, proc, CreateProcess(std_in, std_out, std_err, close_fds), StdStream(CreatePipe, NoStream), terminateProcess, waitForProcess)
+import "base" Control.Concurrent.MVar (newEmptyMVar, putMVar, takeMVar)
+import "base" Control.Concurrent (forkFinally, forkIO, threadDelay)
+
 import "xnukbot" Xnukbot.Plugin (Plugin)
 import "xnukbot" Xnukbot.Plugin.Simple (simplePlugin)
 import "pcre-heavy" Text.Regex.PCRE.Heavy (re, Regex)
@@ -16,7 +19,6 @@ import qualified "text" Data.Text as T (null, takeWhile)
 import "text" Data.Text.IO (hPutStr)
 import "text" Data.Text.Encoding (decodeUtf8With)
 import System.IO (hClose, hSetBinaryMode)
-import "base" System.Timeout (timeout)
 import Control.Exception (catch, SomeException, bracket)
 
 regex, prefRegex :: Regex
@@ -26,10 +28,10 @@ prefRegex = [re|^hyeong\s*(.+)\s*$|]
 
 runHyeong :: Text -> IO Text
 runHyeong code = do
-    (path, h) <- mkstemp "/tmp/hyeong"
-    hSetBinaryMode h False -- TextMode
-    hPutStr h code
-    hClose h
+    path <- bracket (mkstemp "/tmp/hyeong") (hClose . snd) $ \(path, h) -> do
+        hSetBinaryMode h False -- Text Mode
+        hPutStr h code
+        return path
 
     let start = do
             (_, Just hout, _, process) <- createProcess (proc "rshyeong" [path])
@@ -40,19 +42,25 @@ runHyeong code = do
                 }
             return (hout, process)
 
-        between (hout, _) = timeout 5000000 (hGet hout 600)
-
         end (hout, process) = do
             hClose hout
             terminateProcess process
             waitForProcess process
             catch (removeFile path) $ \e -> print (e :: SomeException)
 
-        decode = T.takeWhile (\x -> not (x == '\r' || x == '\n'))
+        decode = T.takeWhile (\x -> x /= '\r' && x /= '\n')
                . decodeUtf8With (\_ _ -> Nothing)
 
-    output <- bracket start end between
-    return $ maybe mempty decode output
+    bracket start end $ \(hout, _) -> do
+        result <- newEmptyMVar
+        _ <- forkFinally (hGet hout 600) (putMVar result . either (const mempty) id)
+
+        forkIO $ do
+            threadDelay 5000000 -- 5 sec
+            hClose hout
+
+        output <- takeMVar result
+        return $ decode output
 
 plugin :: Plugin
 plugin = simplePlugin "Hyeong" (prefRegex, regex) $ \_ _ _ ->
