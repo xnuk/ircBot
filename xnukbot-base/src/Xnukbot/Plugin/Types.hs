@@ -31,9 +31,7 @@ type Prefix = PrefixT Text
 
 --- Plugin ---
 type Checker = Setting -> Message -> Bool
---type MsgChecker = Setting -> (Channel, Nick, ByteString) -> Bool
 type Messager = Setting -> Sender -> Message -> IO Setting
---type MsgMessager = Setting -> Sender -> (Channel, Nick, ByteString) -> IO Setting
 type Sender = [Message] -> IO ()
 type Plug = Setting -> Sender -> Message -> Maybe (IO Setting)
 type Plugin = (String, Plug)
@@ -51,22 +49,6 @@ makePlugin name checker messager = (name, plug)
                 then Just $ messager setting' sender' msg
                 else Nothing
 
-{-
-fromMsgChecker :: MsgChecker -> Checker
-fromMsgChecker checker setting' (Message (Just (NickName nick _ _)) "PRIVMSG" [chan, msg]) =
-    checker setting' (chan, nick, msg)
-
-fromMsgChecker _ _ _ = False
-
-fromMsgMessager :: MsgMessager -> Messager
-fromMsgMessager messager setting' send (Message (Just (NickName nick _ _)) "PRIVMSG" [chan, msg]) =
-    messager setting' send (chan, nick, msg)
-
-fromMsgMessager _ _ _ _ = fail "Nope"
-
-makeMsgPlugin :: String -> MsgChecker -> MsgMessager -> Plugin
-makeMsgPlugin name checker messager = makePlugin name (fromMsgChecker checker) (fromMsgMessager messager)
--}
 --- Attr ---
 data AttrT a = Forced a
              | Protected a

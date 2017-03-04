@@ -10,9 +10,9 @@ cabal-version: 1.12
 
 library
   hs-source-dirs: src/
-  exposed-modules: Xnukbot.Plugin.Data.Random, Xnukbot.Plugin.Data.Random.Util, Xnukbot.Plugin.Hyeong, Xnukbot.Plugin.Ignore, Xnukbot.Plugin.Join.Invite, Xnukbot.Plugin.Join.Part, Xnukbot.Plugin.Mode.DeclineOp, Xnukbot.Plugin.Setting.Export, Xnukbot.Plugin.Simple.Calc, Xnukbot.Plugin.Simple.Emoji
+  exposed-modules: Xnukbot.Plugin.Data.Random, Xnukbot.Plugin.Data.Random.Util, Xnukbot.Plugin.Hyeong, Xnukbot.Plugin.Ignore, Xnukbot.Plugin.Join.Invite, Xnukbot.Plugin.Join.Part, Xnukbot.Plugin.Mode.DeclineOp, Xnukbot.Plugin.Network.GithubStreak, Xnukbot.Plugin.Setting.Export, Xnukbot.Plugin.Simple.Calc, Xnukbot.Plugin.Simple.Emoji
   ghc-options: -Wall
-  build-depends: attoparsec, attoparsec-expr, base >= 4.8 && < 5, bytestring, deepseq, directory, filepath, pcre-heavy, pcre-light, process, random, safe, text, unix, unordered-containers, xnukbot, yaml
+  build-depends: attoparsec, attoparsec-expr, base >= 4.8 && < 5, bytestring, conduit, deepseq, directory, filepath, http-conduit, http-types, pcre-heavy, pcre-light, process, random, resourcet, safe, tagstream-conduit, text, unix, unordered-containers, xnukbot, yaml, conduit-extra
   default-language: Haskell2010
   default-extensions: PackageImports, ApplicativeDo
 

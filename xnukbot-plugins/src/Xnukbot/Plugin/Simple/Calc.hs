@@ -16,7 +16,7 @@ import Control.Exception (evaluate)
 import "deepseq" Control.DeepSeq (force)
 
 import "xnukbot" Xnukbot.Plugin (Plugin)
-import "xnukbot" Xnukbot.Plugin.Simple (simplePlugin)
+import "xnukbot" Xnukbot.Plugin.Simple (privPlugin, regexMatch, prefix')
 
 import "pcre-heavy" Text.Regex.PCRE.Heavy (re)
 
@@ -126,7 +126,10 @@ parser :: Text -> Either String (Maybe Rational)
 parser = parseOnly expression . T.strip
 
 plugin :: Plugin
-plugin = simplePlugin "Calc" ([re|^calc\s+(.+)\s*$|], [re|^\s*(\(?\s*(?:-?(?:l[ngb]|exp)\s*\(?\s*\d+(?:\.\d+)?|\(?\s*(?:-?\d+(?:\.\d+)?|pi|e)\s*[\-\+\^\*/\+]).*)\s*$|]) $ \_ _ _ -> f
+plugin = privPlugin "Calc" $ prefix'
+    (regexMatch [re|^calc\s+(.+)\s*$|])
+    (regexMatch [re|^\s*(\(?\s*(?:-?(?:l[ngb]|exp)\s*\(?\s*\d+(?:\.\d+)?|\(?\s*(?:-?\d+(?:\.\d+)?|pi|e)\s*[\-\+\^\*/\+]).*)\s*$|])
+    (Just . f)
     where
         f x = case x of
             Right [y] -> parseTimeout y

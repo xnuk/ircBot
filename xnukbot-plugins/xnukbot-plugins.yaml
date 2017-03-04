@@ -23,6 +23,7 @@ lib:
         - Xnukbot.Plugin.Setting.*
         - Xnukbot.Plugin.Ignore
         - Xnukbot.Plugin.Mode.*
+        - Xnukbot.Plugin.Network.*
           # - Xnukbot.Plugin.Mueval
 
 test:

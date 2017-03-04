@@ -10,7 +10,7 @@ import "base" Control.Concurrent.MVar (newEmptyMVar, putMVar, takeMVar)
 import "base" Control.Concurrent (forkFinally, forkIO, threadDelay)
 
 import "xnukbot" Xnukbot.Plugin (Plugin)
-import "xnukbot" Xnukbot.Plugin.Simple (simplePlugin)
+import "xnukbot" Xnukbot.Plugin.Simple (privPlugin, regexMatch, prefix')
 import "pcre-heavy" Text.Regex.PCRE.Heavy (re, Regex)
 
 import "bytestring" Data.ByteString (hGet)
@@ -20,6 +20,8 @@ import "text" Data.Text.IO (hPutStr)
 import "text" Data.Text.Encoding (decodeUtf8With)
 import System.IO (hClose, hSetBinaryMode)
 import Control.Exception (catch, SomeException, bracket)
+import Control.Monad ((>=>))
+import Safe (headMay)
 
 regex, prefRegex :: Regex
 regex = [re|^\s*((?:(?:[형항핫흣흡흑]|혀어*엉|하아*[앙앗]|흐으*[읏읍윽])[\.…⋯⋮]*[!\?♥❤💕💖💗💘💙💚💛💜💝♡]*\s*)+)$|]
@@ -63,6 +65,10 @@ runHyeong code = do
         return $ decode output
 
 plugin :: Plugin
-plugin = simplePlugin "Hyeong" (prefRegex, regex) $ \_ _ _ ->
-    let toList x = if T.null x then [] else [x]
-    in fmap toList . runHyeong . either head head
+plugin = privPlugin "Hyeong" $ prefix' (regexMatch prefRegex) (regexMatch regex) $ either headMay headMay >=> \x -> Just $ do
+    result <- runHyeong x
+    if T.null result
+        then return []
+        else return [result]
+
+
