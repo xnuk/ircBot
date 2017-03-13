@@ -1,5 +1,5 @@
 {-# LANGUAGE QuasiQuotes, OverloadedStrings, NamedFieldPuns #-}
-module Xnukbot.Plugin.Setting.Export (configPath, plugin) where
+module Xnukbot.Plugin.Setting.Export (plugin) where
 
 import Prelude hiding (writeFile, head)
 
@@ -13,17 +13,15 @@ import qualified "unordered-containers" Data.HashMap.Strict as M
 import Control.Concurrent (forkIO)
 import Data.Maybe (fromMaybe)
 
-configPath :: IO FilePath
-configPath = do
-    dir <- getXdgDirectory XdgConfig "xnukbot"
-    createDirectoryIfMissing True dir
-    return $ dir </> "config.yaml"
+--configPath :: IO FilePath
+--configPath = do
+--    dir <- getXdgDirectory XdgConfig "xnukbot"
+--    createDirectoryIfMissing True dir
+--    return $ dir </> "config.yaml"
 
-plug :: Plug
-plug setting send (Message (Just (NickName nick _ host)) "PRIVMSG" [chan, msg])
+plug :: FilePath -> Plug
+plug path setting send (Message (Just (NickName nick _ host)) "PRIVMSG" [chan, msg])
     | host == Just "xnu.kr" && maybe False (=~ [re|^save\s*$|]) (removePrefix chan setting msg) = Just . (>> return setting) . forkIO $ do
-
-        path <- configPath
 
         fileExist <- doesFileExist path
         semi <- if fileExist
@@ -34,7 +32,7 @@ plug setting send (Message (Just (NickName nick _ host)) "PRIVMSG" [chan, msg])
         encodeFile path newSemi
         send [ privmsgNoPref chan nick " ✓ 저장했습니다" ]
     | otherwise = Nothing
-plug _ _ _ = Nothing
+plug _ _ _ _ = Nothing
 
-plugin :: Plugin
-plugin = ("SettingExport", plug)
+plugin :: FilePath -> Plugin
+plugin path = ("SettingExport", plug path)

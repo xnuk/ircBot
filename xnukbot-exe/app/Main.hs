@@ -25,9 +25,9 @@ import "xnukbot" Xnukbot.Server.Znc (connect)
 import "xnukbot" Xnukbot.IrcBot (bot)
 import "xnukbot" Xnukbot.Plugin.Types (Plugin, fromSemiSetting, Config(Config))
 
-import "xnukbot-plugins" Xnukbot.Plugin.Setting.Export (configPath)
-
 import System.Exit (exitFailure)
+
+import System.Environment (getArgs)
 
 #define I(Z) import qualified Xnukbot.Plugin.Z
 -- I(Mueval)
@@ -46,28 +46,31 @@ I(Mode.DeclineOp)
 I(Base.Logger)
 #undef I
 
-plugins :: Vector Plugin
-plugins = empty
-#define I(Z) `snoc` Xnukbot.Plugin.Z.plugin
-    -- I(Mueval)
-    I(Setting.Export)
-    I(Ignore)
-    I(Base.Setting)
-    I(Simple.Emoji)
-    I(Data.Random)
-    I(Network.GithubStreak)
-    I(Hyeong)
-    I(Simple.Calc)
-    I(Base.Echo)
-    I(Join.Invite)
-    I(Join.Part)
-    I(Mode.DeclineOp)
-    I(Base.Logger)
-#undef I
-
 main :: IO ()
 main = do
-    path <- configPath
+    [path] <- getArgs
+    --dir <- getXdgDirectory XdgConfig "xnukbot"
+    --createDirectoryIfMissing True dir
+    --let path = dir </> "config.yaml"
+
+    let plugins :: Vector Plugin
+        plugins = empty
+#define I(Z) `snoc` Xnukbot.Plugin.Z.plugin
+            I(Setting.Export) path
+            I(Ignore)
+            I(Base.Setting)
+            I(Simple.Emoji)
+            I(Data.Random)
+            I(Network.GithubStreak)
+            I(Hyeong)
+            I(Simple.Calc)
+            I(Base.Echo)
+            I(Join.Invite)
+            I(Join.Part)
+            I(Mode.DeclineOp)
+            I(Base.Logger)
+#undef I
+
     fileExist <- doesFileExist path
     unless fileExist exitFailure
     Just semiSetting <- decodeFile path
