@@ -48,10 +48,10 @@ level :: IntMap Level -> Int -> Maybe String
 level m x = do
     (k, a) <- lookupLE x m
     case a of
-        Terrible -> return $ show a ++ "(" ++ show k ++ "~)"
+        Terrible -> return $ show a ++ '(':show k ++ "~)"
         _ -> do
             (k', _) <- lookupGT x m
-            return $ show a ++ "(" ++ show k ++ "~" ++ show (pred k') ++ ")"
+            return $ show a ++ '(':show k ++ '~':show (pred k') ++ ")"
 
 expandRev :: Show a => Int -> IntMap a -> (Maybe a, [Maybe a])
 expandRev time m =
@@ -67,7 +67,7 @@ expandRev time m =
 render' :: Show a => [Maybe a] -> Text
 render' [] = mempty
 render' [x] = maybe mempty (pack . show) x
-render' (x:xs) = render' xs <> ('→' `T.cons` maybe mempty (pack . show) x)
+render' (x:xs) = render' xs <> (" → " <> maybe mempty (pack . show) x)
 
 render :: Int -> IntMap Level -> Int -> IntMap Rational -> Text
 render len z time m =
