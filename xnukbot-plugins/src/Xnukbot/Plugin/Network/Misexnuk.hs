@@ -29,7 +29,7 @@ get key place = do
             runResourceT $ do
                 resp <- http req manager
                 responseBody resp $$+- (decode utf8 =$= crawl)
-        Nothing -> return []
+        Nothing -> return ["\129300"] -- 🤔
 
 plugin :: ByteString -> Plugin
 plugin key = privPlugin' "Misexnuk" $ \msg -> do
