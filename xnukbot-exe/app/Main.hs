@@ -37,6 +37,7 @@ I(Base.Setting)
 I(Simple.Emoji)
 I(Data.Random)
 I(Network.GithubStreak)
+I(Network.Misexnuk)
 I(Hyeong)
 I(Simple.Calc)
 I(Base.Echo)
@@ -53,6 +54,14 @@ main = do
     --createDirectoryIfMissing True dir
     --let path = dir </> "config.yaml"
 
+    fileExist <- doesFileExist path
+    unless fileExist exitFailure
+    Just semiSetting <- decodeFile path
+    let Config (setting, conf) = fromSemiSetting semiSetting
+        Just password = lookup "password" conf
+        Just id' = lookup "id" conf
+        Just daumkey = lookup "daumkey" conf
+
     let plugins :: Vector Plugin
         plugins = empty
 #define I(Z) `snoc` Xnukbot.Plugin.Z.plugin
@@ -62,6 +71,7 @@ main = do
             I(Simple.Emoji)
             I(Data.Random)
             I(Network.GithubStreak)
+            I(Network.Misexnuk) (encodeUtf8 daumkey)
             I(Hyeong)
             I(Simple.Calc)
             I(Base.Echo)
@@ -70,13 +80,6 @@ main = do
             I(Mode.DeclineOp)
             I(Base.Logger)
 #undef I
-
-    fileExist <- doesFileExist path
-    unless fileExist exitFailure
-    Just semiSetting <- decodeFile path
-    let Config (setting, conf) = fromSemiSetting semiSetting
-        Just password = lookup "password" conf
-        Just id' = lookup "id" conf
 
     (sendingQueue, byebye) <- bot (connect (encodeUtf8 id') (encodeUtf8 password)) setting plugins
 

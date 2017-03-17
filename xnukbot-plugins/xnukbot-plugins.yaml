@@ -24,6 +24,8 @@ lib:
         - Xnukbot.Plugin.Ignore
         - Xnukbot.Plugin.Mode.*
         - Xnukbot.Plugin.Network.*
+        - Xnukbot.Plugin.Network.Misexnuk
+        - Xnukbot.Plugin.Network.Misexnuk.*
           # - Xnukbot.Plugin.Mueval
 
 test:
