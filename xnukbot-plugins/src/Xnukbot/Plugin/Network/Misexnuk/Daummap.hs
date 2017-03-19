@@ -56,8 +56,8 @@ header s = (parseRequest_ s)
     , requestHeaders = [("Accept", "application/json")]
     }
 
-searchKeyword, searchAddr :: FromJSON a => ByteString -> ByteString -> IO a
-searchKeyword key place = fmap getResponseBody . httpJSON $ header "https://apis.daum.net/local/v1/search/keyword.json" & setQueryString
+searchKeyword, searchAddr :: ByteString -> ByteString -> Request
+searchKeyword key place = header "https://apis.daum.net/local/v1/search/keyword.json" & setQueryString
     [ ("apikey", Just key)
     , ("page", Just "1")
     , ("count", Just "1")
@@ -65,7 +65,7 @@ searchKeyword key place = fmap getResponseBody . httpJSON $ header "https://apis
     , ("query", Just place)
     ]
 
-searchAddr key place = fmap getResponseBody . httpJSON $ header "https://apis.daum.net/local/geo/addr2coord" & setQueryString
+searchAddr key place = header "https://apis.daum.net/local/geo/addr2coord" & setQueryString
         [ ("apikey", Just key)
         , ("pageno", Just "1")
         , ("output", Just "json")
@@ -75,7 +75,6 @@ searchAddr key place = fmap getResponseBody . httpJSON $ header "https://apis.da
 
 {-# INLINE search #-}
 search :: FromJSON a => ByteString -> ByteString -> IO (Maybe a)
-search key place =
-    either (const Nothing) Just <$>
-        race (searchKeyword key place) (searchAddr key place)
+search key place = either (const Nothing) Just <$> race (f searchKeyword) (f searchAddr)
+    where f g = fmap getResponseBody . httpJSON $ g key place
 
