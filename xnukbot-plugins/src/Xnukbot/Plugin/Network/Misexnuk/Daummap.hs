@@ -13,20 +13,9 @@ import "vector" Data.Vector ((!?))
 import Data.Maybe (fromMaybe)
 import Data.ByteString (ByteString)
 
-import "async" Control.Concurrent.Async (waitCatch, waitEitherCatch, withAsync)
+import "async" Control.Concurrent.Async (waitCatch, withAsync)
 
 import Control.Exception (SomeException)
-
-race :: IO a -> IO a -> IO (Either SomeException a)
-race a b =
-    withAsync a $ \l ->
-        withAsync b $ \r -> do
-            z <- waitEitherCatch l r
-            case z of
-                Left (Left _) -> waitCatch r
-                Left x -> return x
-                Right (Left _) -> waitCatch l
-                Right x -> return x
 
 data Dildo = Dildo
     { title :: Text
@@ -34,6 +23,7 @@ data Dildo = Dildo
     , lng :: Text
     }
 
+{-# INLINE withKey #-}
 withKey :: String -> [Either Int Text]
         -> (String -> (b -> Parser a) -> Value -> Parser a)
         ->            (b -> Parser a)
@@ -57,6 +47,7 @@ header s = (parseRequest_ s)
     }
 
 searchKeyword, searchAddr :: ByteString -> ByteString -> Request
+{-# INLINE searchKeyword #-}
 searchKeyword key place = header "https://apis.daum.net/local/v1/search/keyword.json" & setQueryString
     [ ("apikey", Just key)
     , ("page", Just "1")
@@ -65,6 +56,7 @@ searchKeyword key place = header "https://apis.daum.net/local/v1/search/keyword.
     , ("query", Just place)
     ]
 
+{-# INLINE searchAddr #-}
 searchAddr key place = header "https://apis.daum.net/local/geo/addr2coord" & setQueryString
         [ ("apikey", Just key)
         , ("pageno", Just "1")
@@ -73,8 +65,13 @@ searchAddr key place = header "https://apis.daum.net/local/geo/addr2coord" & set
         , ("q", Just place)
         ]
 
-{-# INLINE search #-}
-search :: FromJSON a => ByteString -> ByteString -> IO (Maybe a)
-search key place = either (const Nothing) Just <$> race (f searchKeyword) (f searchAddr)
-    where f g = fmap getResponseBody . httpJSON $ g key place
+search :: FromJSON a => ByteString -> ByteString -> IO (Either SomeException a)
+search key place =
+    let f g = fmap getResponseBody . httpJSON $ g key place
+    in withAsync (f searchAddr) $ \addr ->
+        withAsync (f searchKeyword) $ \keyword -> do
+            z <- waitCatch addr
+            case z of
+                Left _ -> waitCatch keyword
+                Right x -> return $ Right x
 

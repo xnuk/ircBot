@@ -22,14 +22,14 @@ get :: ByteString -> Text -> IO [Text]
 get key place = do
     a <- search key (encodeUtf8 place)
     case a of
-        Just Dildo{lat, lng} -> do
+        Right Dildo{lat, lng} -> do
             let req = parseRequest_ "http://m.airkorea.or.kr/sub_new/sub11.jsp" &
                     setQueryString [("lat", Just $ encodeUtf8 lat), ("lng", Just $ encodeUtf8 lng)]
             manager <- newManager tlsManagerSettings
             runResourceT $ do
                 resp <- http req manager
                 responseBody resp $$+- (decode utf8 =$= crawl)
-        Nothing -> return ["\129300"] -- 🤔
+        Left x -> print (show x) >> return ["\129300"] -- 🤔
 
 plugin :: ByteString -> Plugin
 plugin key = privPlugin' "Misexnuk" $ \msg -> do
