@@ -2,7 +2,7 @@
 module Xnukbot.Plugin.Network.Misexnuk where
 
 import "http-conduit" Network.HTTP.Conduit (http, parseRequest_, responseBody, setQueryString, newManager, tlsManagerSettings)
-import Xnukbot.Plugin.Network.Misexnuk.Daummap (Dildo(Dildo, lat, lng), search)
+import Xnukbot.Plugin.Network.Misexnuk.Daummap (Dildo(Dildo, title, lat, lng), search)
 import Xnukbot.Plugin.Network.Misexnuk.Html (crawl)
 
 import Data.Function ((&))
@@ -22,9 +22,10 @@ get :: ByteString -> Text -> IO [Text]
 get key place = do
     a <- search key (encodeUtf8 place)
     case a of
-        Right Dildo{lat, lng} -> do
+        Right Dildo{title, lat, lng} -> do
+            print title
             let req = parseRequest_ "http://m.airkorea.or.kr/sub_new/sub11.jsp" &
-                    setQueryString [("lat", Just $ encodeUtf8 lat), ("lng", Just $ encodeUtf8 lng)]
+                    setQueryString [("lat", Just lat), ("lng", Just lng)]
             manager <- newManager tlsManagerSettings
             runResourceT $ do
                 resp <- http req manager

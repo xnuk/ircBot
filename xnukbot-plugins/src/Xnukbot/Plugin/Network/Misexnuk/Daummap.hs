@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Xnukbot.Plugin.Network.Misexnuk.Daummap (Dildo(..), search) where
 
-import "aeson" Data.Aeson ((.:), FromJSON(parseJSON), Value(Object, Null, Array), withObject)
+import "aeson" Data.Aeson ((.:), FromJSON(parseJSON), Value(Object, Null, Array, Number, String), withObject)
 import "aeson" Data.Aeson.Types (typeMismatch, Parser)
 import "http-conduit" Network.HTTP.Conduit (parseRequest_, method, secure, requestHeaders, setQueryString, Request)
 import "http-conduit" Network.HTTP.Simple (httpJSON, getResponseBody)
@@ -17,11 +17,25 @@ import "async" Control.Concurrent.Async (waitCatch, withAsync)
 
 import Control.Exception (SomeException)
 
+import "safe" Safe (readMay)
+
+import "scientific" Data.Scientific (formatScientific, FPFormat(Fixed), Scientific)
+import "bytestring" Data.ByteString.Char8 (pack)
+
 data Dildo = Dildo
     { title :: Text
-    , lat :: Text
-    , lng :: Text
+    , lat :: ByteString
+    , lng :: ByteString
     }
+
+newtype Sci = Sci Scientific
+
+instance FromJSON Sci where
+    parseJSON (String a) = case readMay (unpack a) of
+        Just x -> return $ Sci x
+        Nothing -> typeMismatch "Should be a number, but it's not." (String a)
+    parseJSON (Number a) = return $ Sci a
+    parseJSON x = typeMismatch "It's not a number" x
 
 {-# INLINE withKey #-}
 withKey :: String -> [Either Int Text]
@@ -36,7 +50,10 @@ withKey base _ _ _ x = typeMismatch base x
 
 instance FromJSON Dildo where
     parseJSON = withKey "Dildo" [Right "channel", Right "item", Left 0] withObject $ \o ->
-        Dildo <$> o .: "title" <*> (o .: "latitude"  <|> o .: "lat") <*> (o .: "longitude" <|> o .: "lng")
+        let sci x = do
+                Sci a <- x
+                return . pack $ formatScientific Fixed Nothing a
+        in Dildo <$> o .: "title" <*> sci (o .: "latitude"  <|> o .: "lat") <*> sci (o .: "longitude" <|> o .: "lng")
 
 {-# INLINE header #-}
 header :: String -> Request
