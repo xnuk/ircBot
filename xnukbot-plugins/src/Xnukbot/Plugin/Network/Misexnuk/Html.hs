@@ -75,7 +75,7 @@ render len z time m =
         m' = fmap (fromIntegral . numerator) m
         t :: Maybe String
         t = a >>= level z
-    in maybe "정보 없음" pack t <> (' ' `T.cons` render' (take len b))
+    in maybe "정보 없음" pack t <> (' ' `T.cons` render' (a:take len b))
 
 fromText :: Token' a -> Maybe a
 fromText (Text a) = Just a
