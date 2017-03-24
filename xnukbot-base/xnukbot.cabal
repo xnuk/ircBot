@@ -12,7 +12,7 @@ library
   hs-source-dirs: src/
   exposed-modules: Network.IRC.Base.Trans, Xnukbot.Connect.Recv, Xnukbot.Connect.Sender, Xnukbot.Connect.TLSConnect, Xnukbot.IrcBot, Xnukbot.Plugin, Xnukbot.Plugin.Attr, Xnukbot.Plugin.Base, Xnukbot.Plugin.Base.Echo, Xnukbot.Plugin.Base.Logger, Xnukbot.Plugin.Base.Setting, Xnukbot.Plugin.Simple, Xnukbot.Plugin.Types, Xnukbot.Plugin.Util, Xnukbot.Server.Uriirc, Xnukbot.Server.Znc
   ghc-options: -Wall
-  build-depends: aeson, attoparsec, base <5 && >= 4.8, bytestring, data-default, hashable, irc, mtl, network, pcre-heavy, safe, stm, text, tls, unordered-containers
+  build-depends: aeson, attoparsec, base <5 && >= 4.8, bytestring, data-default, hashable, irc, mtl, network, pcre-heavy, safe, stm, text, tls, unordered-containers, interpolatedstring-perl6
   default-language: Haskell2010
   default-extensions: PackageImports, ApplicativeDo
 
