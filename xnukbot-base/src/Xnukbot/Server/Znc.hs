@@ -23,9 +23,9 @@ muntil (x:xs) = do
 crlf :: ByteString
 crlf = "\r\n"
 
-connect :: ByteString -> ByteString -> IO ((Context, Socket), ChunkFunc)
-connect username password = do
-    nctx@(ctx, _) <- tlsConnect "znc.xnu.kr" "8152"
+connect :: (String, String) -> ByteString -> ByteString -> IO ((Context, Socket), ChunkFunc)
+connect (serverhost, port) username password = do
+    nctx@(ctx, _) <- tlsConnect serverhost port
     sendData ctx . fromStrict $ [qq|NICK $username{crlf
                                    }USER $username $username $username :$username{crlf
                                    }|]
@@ -37,6 +37,7 @@ connect username password = do
                 then return f'
                 else z f'
 
+        -- this is hard-coded login pattern.
         login msg = case msg_command msg of
             "464" | msg_params msg == [username, "Password required"] -> do
                 sendData ctx . fromStrict $ [qq|PASS $username:$password{crlf}|]

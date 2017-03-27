@@ -81,7 +81,7 @@ main = do
             I(Base.Logger)
 #undef I
 
-    (sendingQueue, byebye) <- bot (connect (encodeUtf8 id') (encodeUtf8 password)) setting plugins
+    (sendingQueue, byebye) <- bot (connect ("znc.xnu.kr", "8152") (encodeUtf8 id') (encodeUtf8 password)) setting plugins
 
 #ifndef DEBUG
     lock <- newEmptyMVar

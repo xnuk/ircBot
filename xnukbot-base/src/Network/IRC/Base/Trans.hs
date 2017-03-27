@@ -39,6 +39,11 @@ This code also redistributed by Xnuk Shuman with BSD-3-Clause.
 
 -}
 
+{-|
+  'Network.IRC.Base' module gives only 'ByteString', but we need to convert to 'Text'.
+  So this is more general type.
+-}
+
 {-# LANGUAGE NamedFieldPuns #-}
 module Network.IRC.Base.Trans (PrefixT(..), MessageT(..), fromByteString, showMessage) where
 
