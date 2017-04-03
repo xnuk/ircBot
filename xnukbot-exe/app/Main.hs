@@ -34,7 +34,7 @@ import System.Environment (getArgs)
 -- Xnukbot.Server.Uriirc.connect :: ByteString -> [ByteString] -> IO ((Context, Socket), ChunkFunc)
 --                                   nickname       channels
 --
-import "xnukbot" Xnukbot.Server.Znc (connect)
+import "xnukbot" Xnukbot.Server.Uriirc (connect)
 
 
 -- This is plugin imports. If you've changed here, you probably want to change `plugins` at `main`.
@@ -65,8 +65,6 @@ main = do
     Just semiSetting <- decodeFile path
     let Config (setting, conf) = fromSemiSetting semiSetting
         -- Required config variables. If you think some of these are useless, just delete it.
-        Just password = lookup "password" conf
-        Just id' = lookup "id" conf
         Just daumkey = lookup "daumkey" conf
 
 -- This is plugin list. If you've changed here, you probably want to change plugin imports.
@@ -93,9 +91,8 @@ main = do
     -- change here if you're not going to use xnu.kr's znc
     (sendingQueue, byebye) <-
         bot (connect
-                ("znc.xnu.kr", "8152")
-                (encodeUtf8 id')
-                (encodeUtf8 password)
+                (encodeUtf8 "즈눅즈눅")
+                ["#hyeon"]
             ) setting plugins
 
 #ifndef DEBUG
