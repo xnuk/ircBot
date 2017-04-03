@@ -21,7 +21,6 @@ import Control.Concurrent.MVar (newEmptyMVar, putMVar, takeMVar)
 
 import "vector" Data.Vector (Vector, snoc, empty)
 
-import "xnukbot" Xnukbot.Server.Znc (connect)
 import "xnukbot" Xnukbot.IrcBot (bot)
 import "xnukbot" Xnukbot.Plugin.Types (Plugin, fromSemiSetting, Config(Config))
 
@@ -29,8 +28,17 @@ import System.Exit (exitFailure)
 
 import System.Environment (getArgs)
 
+-- We choose ZNC, but you want to connect another server, change this.
+-- For instance, we have
+--
+-- Xnukbot.Server.Uriirc.connect :: ByteString -> [ByteString] -> IO ((Context, Socket), ChunkFunc)
+--                                   nickname       channels
+--
+import "xnukbot" Xnukbot.Server.Znc (connect)
+
+
+-- This is plugin imports. If you've changed here, you probably want to change `plugins` at `main`.
 #define I(Z) import qualified Xnukbot.Plugin.Z
--- I(Mueval)
 I(Setting.Export)
 I(Ignore)
 I(Base.Setting)
@@ -49,19 +57,20 @@ I(Base.Logger)
 
 main :: IO ()
 main = do
+    -- $ xnukbot path/to/config.yaml
     [path] <- getArgs
-    --dir <- getXdgDirectory XdgConfig "xnukbot"
-    --createDirectoryIfMissing True dir
-    --let path = dir </> "config.yaml"
 
     fileExist <- doesFileExist path
     unless fileExist exitFailure
     Just semiSetting <- decodeFile path
     let Config (setting, conf) = fromSemiSetting semiSetting
+        -- Required config variables. If you think some of these are useless, just delete it.
         Just password = lookup "password" conf
         Just id' = lookup "id" conf
         Just daumkey = lookup "daumkey" conf
 
+-- This is plugin list. If you've changed here, you probably want to change plugin imports.
+-- Earlier one is checked earlier, and if it says "I want this message!", the next plugins are not checked.
     let plugins :: Vector Plugin
         plugins = empty
 #define I(Z) `snoc` Xnukbot.Plugin.Z.plugin
@@ -81,7 +90,13 @@ main = do
             I(Base.Logger)
 #undef I
 
-    (sendingQueue, byebye) <- bot (connect ("znc.xnu.kr", "8152") (encodeUtf8 id') (encodeUtf8 password)) setting plugins
+    -- change here if you're not going to use xnu.kr's znc
+    (sendingQueue, byebye) <-
+        bot (connect
+                ("znc.xnu.kr", "8152")
+                (encodeUtf8 id')
+                (encodeUtf8 password)
+            ) setting plugins
 
 #ifndef DEBUG
     lock <- newEmptyMVar
