@@ -128,7 +128,7 @@ parser = parseOnly expression . T.strip
 plugin :: Plugin
 plugin = privPlugin "Calc" $ prefix'
     (regexMatch [re|^calc\s+(.+)\s*$|])
-    (regexMatch [re|^\s*(\(?\s*(?:-?(?:l[ngb]|exp)\s*\(?\s*\d+(?:\.\d+)?|\(?\s*(?:-?\d+(?:\.\d+)?|pi|e)\s*[\-\+\^\*/\+]).*)\s*$|])
+    (regexMatch [re|^\s*(\(?\s*(?:-?(?:l[ngb]|exp)\s*\(?\s*\d+(?:\.\d+)?|\(?\s*(?:-?\d+(?:\.\d+)?|pi|e)\s*[\-\+\^\*/\+])[^가-힣ㄱ-ㅎㅏ-ㅣ]*)\s*$|])
     (Just . f)
     where
         f x = case x of
