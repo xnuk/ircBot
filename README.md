@@ -1,5 +1,5 @@
 # ircBot
-
+하스켈로 작성한 개인용 IRC 봇
 ## 사전
 ```
 <@User> !dic clandestine
